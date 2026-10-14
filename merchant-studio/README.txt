@@ -29,8 +29,11 @@ DEMO SCRIPT (about 5 minutes)
      email on that merchant's domain (e.g. ops@jollibee.com.ph), click Verify,
      wait for the simulated check, then sign in with that email.
    - Unregistered emails are told to register first; personal domains are rejected.
-2. Confirm the business profile (name and industry come from the directory).
-3. Build page: the merchant's industry templates come first.
+2. After sign-in you land straight on your industry's top 10 use cases (the
+   industry comes from the merchant directory). "See all templates" shows all
+   40 across industries. To change the industry, open Profile (merchant menu,
+   top right) > "Industry looks wrong?".
+3. Build page:
    a. Template path: click "Post-order feedback call", tweak it, look at the
       Preview and NEO JSON tabs, then "Deploy to NEO".
    b. Prompt path: at the bottom, click "Want to build something else? Click here",
@@ -40,7 +43,12 @@ DEMO SCRIPT (about 5 minutes)
    "Trigger", upload a CSV (or use the sample list), then "Schedule" to fill in
    the NEO-style Schedule Details (name, days of week, period, Start Immediately).
    The required CSV headers are the agent's variables, as in NEO.
-   Open an agent to place a test call, see call logs, and follow its Schedules.
+   Double-click an agent (or click Open) to place a test call, see call logs,
+   and follow its Schedules.
+   Click "Edit" on an agent to change its script, steps, outcomes or CSV
+   variables. "Save & republish" publishes a new version; the Versions tab
+   lists every version and can restore an older one. Schedules that already
+   started keep the version they began with.
 5. Each merchant only sees its own agents. Use the merchant menu (top right) >
    "Reset demo data" to clear agents and registrations and start over.
 

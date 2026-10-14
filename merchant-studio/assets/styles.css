@@ -551,3 +551,32 @@ label.field.has-error > span { color: var(--danger); }
 /* keep the footer at the bottom on short pages */
 #app { min-height: 100vh; display: flex; flex-direction: column; }
 #app > main { flex: 1; }
+
+/* ---------- editable agents ---------- */
+.var-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.var-chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 12.5px; font-weight: 600; padding: 4px 6px 4px 10px; border-radius: 6px; background: var(--sky-50); color: var(--globe-navy); }
+.var-chip button { border: 0; background: transparent; color: var(--muted); padding: 0 4px; font-size: 12px; line-height: 1; border-radius: 4px; }
+.var-chip button:hover { color: var(--danger); background: var(--danger-50); }
+.var-chip .lock { font-size: 11px; padding-right: 4px; cursor: help; }
+.var-add { display: flex; gap: 8px; max-width: 360px; }
+.var-add .input { padding: 8px 12px; font-family: var(--mono); font-size: 13px; }
+.ver-row { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+.ver-row:last-child { border-bottom: 0; }
+.ver-row.current { background: var(--sky-50); }
+.ver-badge { flex: none; min-width: 42px; text-align: center; font-weight: 700; font-size: 13px; color: #fff; background: var(--globe-navy); border-radius: var(--pill); padding: 4px 10px; }
+.ver-row:not(.current) .ver-badge { background: #c4cbd9; }
+.ver-main { flex: 1; min-width: 0; }
+.ver-main b { color: var(--globe-navy); font-size: 14px; }
+
+/* ---------- all templates ---------- */
+.ind-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: -6px 0 22px; }
+.ind-chips button { border: 1px solid var(--line-strong); background: #fff; color: var(--globe-navy); font-weight: 700; font-size: 13px; padding: 7px 14px; border-radius: var(--pill); }
+.ind-chips button:hover { border-color: var(--action); }
+.ind-chips button.on { background: var(--globe-navy); border-color: var(--globe-navy); color: #fff; }
+.ind-head { font-size: 20px; margin: 4px 0 14px; display: flex; align-items: center; gap: 10px; }
+
+/* ---------- profile ---------- */
+details.subtle { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 12px; }
+details.subtle summary { cursor: pointer; font-size: 12.5px; color: var(--muted); list-style: none; width: fit-content; }
+details.subtle summary::-webkit-details-marker { display: none; }
+details.subtle summary:hover { color: var(--action); text-decoration: underline; }

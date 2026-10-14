@@ -94,7 +94,7 @@
             <div class="menu hidden" id="menu">
               <div class="small muted" style="padding:8px 12px">${esc(u.email)}</div>
               <div class="sep"></div>
-              <button data-act="industry">Change industry</button>
+              <button data-act="profile">Profile</button>
               <button data-act="reset">Reset demo data</button>
               <button data-act="logout">Sign out</button>
             </div>
@@ -114,7 +114,7 @@
       const act = e.target.dataset.act;
       if (act === "logout") { state.user = null; state.draft = null; save(); go("#/welcome"); }
       if (act === "reset") { if (confirm("Remove all demo data (services and registrations) and sign out?")) { state = { user: null, agents: [], draft: null }; save(); go("#/welcome"); } }
-      if (act === "industry") go("#/onboard");
+      if (act === "profile") go("#/profile");
     });
   }
 
@@ -385,7 +385,9 @@
       if (!known) state.user = { email: otp.email, domain: otp.merchant.domain, merchant: otp.merchant.name, industry: otp.merchant.industry, detected: otp.merchant.detected };
       otp = null;
       save();
-      go(state.user.industry && known ? "#/build" : "#/onboard");
+      if (!known) state.user.since = Date.now();
+      save();
+      go(state.user.industry ? "#/build" : "#/onboard");
     };
     $("#resend").onclick = (e) => { e.preventDefault(); otp.code = String(Math.floor(100000 + Math.random() * 900000)); sendCodeToast(); };
     $("#changeEmail").onclick = (e) => { e.preventDefault(); otp = null; $$(".toast").forEach((t) => t.remove()); renderEmail(""); };
@@ -430,24 +432,40 @@
   // ---------- build (home) ----------
   let homeFilter = { channel: "all", industry: null, mode: "auto" };
 
-  function viewBuild() {
+  function viewBuild(showAll) {
     const u = state.user;
-    const ind = homeFilter.industry || u.industry;
+    const mine = industry(u.industry);
+    const live = D.industries.filter((i) => i.live);
+    const chSeg = `<div class="seg" id="chFilter" style="background:#fff;border:1px solid var(--line)">
+      ${["all", "voice", "chat", "flow"].map((c) => `<button data-c="${c}" class="${homeFilter.channel === c ? "on" : ""}">${c === "all" ? "All" : chName[c]}</button>`).join("")}</div>`;
+    let body;
+    if (!showAll) {
+      body = `
+        <div class="page-head">
+          <div><h1>${mine.icon} Top use cases for ${esc(mine.name)}</h1>
+          <p class="muted" style="margin:6px 0 0">Ready-made agents for ${esc(u.merchant)}. Pick one, adjust it, and deploy to NEO.</p></div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${chSeg}<a class="btn btn-ghost btn-sm" href="#/build/all">See all templates →</a></div>
+        </div>
+        <div class="tpl-grid">${templateCards(u.industry)}</div>`;
+    } else {
+      const inds = homeFilter.industry ? live.filter((i) => i.id === homeFilter.industry) : [mine, ...live.filter((i) => i.id !== mine.id)];
+      const total = live.reduce((n, i) => n + D.templates[i.id].length, 0);
+      body = `
+        <div class="crumbs"><a href="#/build">Top use cases for ${esc(mine.name)}</a> › All templates</div>
+        <div class="page-head">
+          <div><h1>All templates</h1><p class="muted" style="margin:6px 0 0">${total} ready-made agents across every industry. Use any of them, whatever your industry.</p></div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${chSeg}</div>
+        </div>
+        <div class="ind-chips" id="indChips">
+          <button data-i="" class="${homeFilter.industry ? "" : "on"}">All industries</button>
+          ${live.map((i) => `<button data-i="${i.id}" class="${homeFilter.industry === i.id ? "on" : ""}">${i.icon} ${esc(i.name)}${i.id === u.industry ? " (yours)" : ""}</button>`).join("")}
+        </div>
+        ${inds.map((i) => `<h2 class="ind-head">${i.icon} ${esc(i.name)}${i.id === u.industry ? ` <span class="badge badge-voice">Your industry</span>` : ""}</h2><div class="tpl-grid" style="margin-bottom:30px">${templateCards(i.id)}</div>`).join("")}
+        <div style="text-align:center"><a class="btn btn-ghost" href="#/build">← Back to top use cases for ${esc(mine.name)}</a></div>`;
+    }
     app.innerHTML = shell("build", `
       <div class="page">
-        <div class="page-head">
-          <div><h1>${industry(ind).icon} Top use cases for ${esc(industry(ind).name)}</h1>
-          <p class="muted" style="margin:6px 0 0">Ready-made agents for ${esc(u.merchant)}. Pick one, adjust it, and deploy to NEO.</p></div>
-          <div class="controls" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <div class="seg" id="chFilter" style="background:#fff;border:1px solid var(--line)">
-              ${["all", "voice", "chat", "flow"].map((c) => `<button data-c="${c}" class="${homeFilter.channel === c ? "on" : ""}">${c === "all" ? "All" : chName[c]}</button>`).join("")}
-            </div>
-            <select class="select-sm" id="indSel">
-              ${D.industries.filter((i) => i.live).map((i) => `<option value="${i.id}" ${i.id === ind ? "selected" : ""}>${i.name}${i.id === u.industry ? " (yours)" : ""}</option>`).join("")}
-            </select>
-          </div>
-        </div>
-        <div class="tpl-grid">${templateCards(ind)}</div>
+        ${body}
         <a class="build-else" href="#/create">
           <span class="be-ic">✨</span>
           <span><b>Want to build something else?</b> <span class="muted">Describe it in your own words.</span></span>
@@ -455,9 +473,66 @@
         </a>
       </div>`);
     bindShell();
-    $("#chFilter").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; homeFilter.channel = b.dataset.c; viewBuild(); };
-    $("#indSel").onchange = (e) => { homeFilter.industry = e.target.value; viewBuild(); };
+    $("#chFilter").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; homeFilter.channel = b.dataset.c; viewBuild(showAll); };
+    const ic = $("#indChips");
+    if (ic) ic.onclick = (e) => { const b = e.target.closest("button"); if (!b) return; homeFilter.industry = b.dataset.i || null; viewBuild(true); };
     $$(".tpl").forEach((t) => (t.onclick = () => useTemplate(t.dataset.ind, t.dataset.id)));
+  }
+
+  // ---------- profile ----------
+  function viewProfile() {
+    const u = state.user;
+    const reg = (state.registered || []).find((r) => r.domain === u.domain);
+    const since = reg ? reg.at : u.since;
+    const fmtDate = (t) => (t ? new Date(t).toLocaleDateString([], { month: "long", day: "numeric", year: "numeric" }) : "-");
+    app.innerHTML = shell("", `
+      <div class="page" style="max-width:820px">
+        <div class="page-head"><div><h1>Profile</h1><p class="muted" style="margin:6px 0 0">Your account and business details.</p></div></div>
+        <div class="card card-pad" style="margin-bottom:18px">
+          <div class="section-title">Account</div>
+          <dl class="kv">
+            <dt>Work email</dt><dd>${esc(u.email)}</dd>
+            <dt>Verified domain</dt><dd>${esc(u.domain)} <span class="badge badge-ok">✓ Verified</span></dd>
+            <dt>Member since</dt><dd>${fmtDate(since)}</dd>
+          </dl>
+        </div>
+        <div class="card card-pad" style="margin-bottom:18px">
+          <div class="section-title">Business</div>
+          <dl class="kv">
+            <dt>Merchant</dt><dd>${esc(u.merchant)}</dd>
+            <dt>Industry</dt><dd>${industry(u.industry).icon} ${esc(industry(u.industry).name)}</dd>
+            <dt>Agents</dt><dd>${myAgents().length}</dd>
+          </dl>
+          <details class="subtle" id="indDetails">
+            <summary>Industry looks wrong?</summary>
+            <p class="small muted" style="margin:10px 0">Your industry decides which top use cases you see first. Your existing agents won't change.</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+              <select class="select" id="indPick" style="width:auto">
+                ${D.industries.map((i) => `<option value="${i.id}" ${i.id === u.industry ? "selected" : ""} ${i.live ? "" : "disabled"}>${i.name}${i.live ? "" : " (coming soon)"}</option>`).join("")}
+              </select>
+              <button class="btn btn-primary btn-sm" id="indSave">Save industry</button>
+              <span class="small" id="indMsg"></span>
+            </div>
+          </details>
+        </div>
+        <div class="card card-pad">
+          <div class="section-title">Session</div>
+          <button class="btn btn-ghost" id="profLogout">Sign out</button>
+        </div>
+      </div>`);
+    bindShell();
+    $("#profLogout").onclick = () => { state.user = null; state.draft = null; save(); go("#/welcome"); };
+    $("#indSave").onclick = () => {
+      const v = $("#indPick").value;
+      if (v === u.industry) { $("#indMsg").textContent = "That's already your industry."; return; }
+      u.industry = v;
+      if (reg) reg.industry = v;
+      homeFilter.industry = null;
+      save();
+      viewProfile();
+      $("#indDetails").open = true;
+      $("#indMsg").innerHTML = `<span style="color:var(--ok);font-weight:700">✓ Saved. <a href="#/build">See your top use cases →</a></span>`;
+    };
   }
 
   // ---------- create from prompt ----------
@@ -618,16 +693,23 @@
   function viewConfigure() {
     if (!state.draft) return go("#/build");
     const spec = state.draft.spec;
+    const editing = state.draft.editOf ? myAgents().find((a) => a.id === state.draft.editOf) : null;
+    if (state.draft.editOf && !editing) { state.draft = null; save(); return go("#/services"); }
+    spec.csvFields = spec.csvFields || D.csvFieldsFor(spec);
+    const origVars = editing ? JSON.stringify(editing.spec.csvFields || D.csvFieldsFor(editing.spec)) : null;
+    const activeRuns = editing ? (editing.schedules || []).filter((x) => x.status === "running").length : 0;
     const tplName = spec.source === "template" ? spec.name : null;
     const isOutVoice = spec.channel === "voice" && spec.direction === "outbound";
     spec.callWindow = spec.callWindow || { from: "09:00", to: "18:00" };
 
-    app.innerHTML = shell("build", `
+    app.innerHTML = shell(editing ? "services" : "build", `
       <div class="page">
-        <div class="crumbs"><a href="#/build">Build</a> › ${tplName ? "Template: " + esc(tplName) : "Customize generated agent"}</div>
-        <div class="page-head">
-          <div><h1>Set up your ${chName[spec.channel].toLowerCase()} ${spec.channel === "flow" ? "" : "agent"}</h1><div style="margin-top:8px">${channelBadges(spec)}</div></div>
-        </div>
+        ${editing
+          ? `<div class="crumbs"><a href="#/services">My Services</a> › <a href="#/agent/${editing.id}/overview">${esc(editing.spec.name)}</a> › Edit</div>
+             <div class="page-head"><div><h1>Edit agent</h1><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">${channelBadges(spec)} <span class="badge badge-gray">Live: v${editing.version || 1}</span> <span class="small muted">Saving publishes v${(editing.version || 1) + 1}. Earlier versions stay available to restore.</span></div></div></div>
+             ${activeRuns ? `<div class="notice">⏳ ${activeRuns} running schedule${activeRuns > 1 ? "s keep" : " keeps"} using v${editing.version || 1} until finished. New schedules use the version you save now.</div>` : ""}`
+          : `<div class="crumbs"><a href="#/build">Build</a> › ${tplName ? "Template: " + esc(tplName) : "Customize generated agent"}</div>
+             <div class="page-head"><div><h1>Set up your ${chName[spec.channel].toLowerCase()} ${spec.channel === "flow" ? "" : "agent"}</h1><div style="margin-top:8px">${channelBadges(spec)}</div></div></div>`}
         <div class="grid-2">
           <div class="card card-pad" id="form">
             <div class="section-title">Basics</div>
@@ -649,6 +731,13 @@
             <div class="section-title">Outcomes to track per ${spec.channel === "voice" ? "call" : "conversation"}</div>
             <div id="metrics">${spec.metrics.map((mt, i) => `<label class="check"><input type="checkbox" data-mi="${i}" ${mt.off ? "" : "checked"}><div><code>${esc(mt.name)}</code> <span class="badge badge-gray">${mt.type}</span><div class="small muted">${esc(mt.desc)}</div></div></label>`).join("")}</div>
 
+            <div class="section-title">Contact variables (CSV headers)</div>
+            <p class="small muted" style="margin:-4px 0 10px">Each row of a Trigger CSV fills these. Headers are case-sensitive.</p>
+            <div class="var-chips" id="vars"></div>
+            <div class="var-add"><input class="input" id="newVar" placeholder="new_variable" autocomplete="off"><button type="button" class="btn btn-soft btn-sm" id="addVar">+ Add</button></div>
+            <div class="error hidden" id="varErr"></div>
+            <div class="notice hidden" id="varWarn" style="margin-top:10px">⚠ Changing variables changes the CSV headers Trigger asks for, from the next schedule onward.</div>
+
             ${spec.tools ? `<div class="section-title">Tools the agent can use</div><div style="display:flex;gap:8px;flex-wrap:wrap">${spec.tools.map((t) => `<span class="badge badge-flow">🔧 ${esc(t)}</span>`).join("")}</div>` : ""}
 
             ${isOutVoice ? `
@@ -663,9 +752,10 @@
               ${["Website widget", "Facebook Messenger", "Viber"].map((c, i) => `<label class="check"><input type="checkbox" ${i === 0 ? "checked" : ""}><div>${c}</div></label>`).join("")}` : ""}
             ${spec.channel === "voice" && spec.direction === "inbound" ? `<div class="section-title">Phone number</div><p class="small muted" style="margin:0">A Globe hotline number is assigned when you deploy.</p>` : ""}
 
+            <div class="error hidden" id="saveErr" style="text-align:right"></div>
             <div class="actions">
-              <a class="btn btn-ghost" href="#/build">Cancel</a>
-              <button class="btn btn-primary btn-lg" id="deployBtn">Deploy to NEO →</button>
+              <a class="btn btn-ghost" id="cancelEdit" href="${editing ? `#/agent/${editing.id}/overview` : "#/build"}">Cancel</a>
+              <button class="btn btn-primary btn-lg" id="deployBtn">${editing ? "Save &amp; republish →" : "Deploy to NEO →"}</button>
             </div>
           </div>
           <div class="sticky">
@@ -692,12 +782,35 @@
         bindJsonCard(exp);
       }
     };
+    const renderVars = () => {
+      const locked = (v) => spec.channel === "voice" && v === "customer_phone";
+      $("#vars").innerHTML = spec.csvFields.map((v, i) => `<span class="var-chip">${esc(v)}${locked(v) ? `<span class="lock" title="NEO dials this number, so it can't be removed">🔒</span>` : `<button type="button" data-vdel="${i}" title="Remove">✕</button>`}</span>`).join("");
+      if (origVars !== null) $("#varWarn").classList.toggle("hidden", JSON.stringify(spec.csvFields) === origVars);
+    };
     renderStages();
+    renderVars();
     renderPane();
+    if (editing) $("#cancelEdit").onclick = () => { state.draft = null; save(); };
+
+    const addVar = () => {
+      const inp = $("#newVar"), err = $("#varErr"), v = inp.value.trim();
+      const msg = !/^[a-z][a-z0-9_]*$/.test(v) ? "Use lowercase letters, numbers and underscores, starting with a letter (e.g. order_id)." : spec.csvFields.includes(v) ? `${v} is already a variable.` : "";
+      err.textContent = msg; err.classList.toggle("hidden", !msg);
+      if (msg) return;
+      spec.csvFields.push(v); inp.value = ""; save(); renderVars(); renderPane();
+    };
+    $("#addVar").onclick = addVar;
+    $("#newVar").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); addVar(); } });
+    $("#vars").addEventListener("click", (e) => {
+      const d = e.target.dataset.vdel;
+      if (d == null) return;
+      spec.csvFields.splice(+d, 1); save(); renderVars(); renderPane();
+    });
 
     const form = $("#form");
     form.addEventListener("input", (e) => {
       const t = e.target;
+      if (t.id === "newVar") return;
       if (t.dataset.f) spec[t.dataset.f] = t.value;
       if (t.dataset.si) spec.stages[+t.dataset.si] = t.value;
       if (t.dataset.cw) spec.callWindow[t.dataset.cw] = t.value;
@@ -715,8 +828,79 @@
     $("#ptabs").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; tab = b.dataset.t; $$("#ptabs button").forEach((x) => x.classList.toggle("on", x === b)); renderPane(); };
     $("#deployBtn").onclick = () => {
       if (!spec.name.trim()) { $('[data-f="name"]').focus(); return; }
-      startDeploy();
+      if (!editing) return startDeploy();
+      const next = activeSpec(spec);
+      const changes = diffSpecs(editing.spec, next);
+      const se = $("#saveErr");
+      if (!changes.length) { se.textContent = "No changes to save yet."; se.classList.remove("hidden"); return; }
+      republish(editing, next, `Changed ${changes.join(", ")}`);
     };
+  }
+
+  // ---------- editing & versions ----------
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+
+  function startEdit(a) {
+    const spec = clone(a.spec);
+    spec.csvFields = spec.csvFields || D.csvFieldsFor(spec);
+    // bring back outcomes that were switched off at deploy time, unticked
+    const tpl = spec.templateId && spec.industryId && (D.templates[spec.industryId] || []).find((t) => t.id === spec.templateId);
+    if (tpl) tpl.metrics.forEach((m) => { if (!spec.metrics.some((x) => x.name === m.name)) spec.metrics.push({ ...m, off: true }); });
+    state.draft = { spec, reasons: null, editOf: a.id };
+    save();
+    go("#/configure");
+  }
+
+  function diffSpecs(a, b) {
+    const label = { name: "name", persona: "persona", language: "language", greeting: a.channel === "voice" ? "opening line" : "welcome message", purpose: "goal", stages: "conversation steps", metrics: "outcomes", csvFields: "contact variables", callWindow: "call window" };
+    const norm = (k, v) => (k === "metrics" ? (v || []).map((m) => m.name) : k === "callWindow" ? v || { from: "09:00", to: "18:00" } : v === undefined ? null : v);
+    return Object.keys(label).filter((k) => JSON.stringify(norm(k, a[k])) !== JSON.stringify(norm(k, b[k]))).map((k) => label[k]);
+  }
+
+  function ensureVersions(a) {
+    if (!a.versions || !a.versions.length) {
+      a.versions = [{ v: 1, at: a.createdAt, by: state.user.email, note: "First deployed", spec: clone(a.spec) }];
+      a.version = 1;
+    }
+  }
+
+  function republish(a, spec, note) {
+    ensureVersions(a);
+    const v = Math.max(...a.versions.map((x) => x.v)) + 1;
+    a.versions.unshift({ v, at: Date.now(), by: state.user.email, note, spec: clone(spec) });
+    a.spec = clone(spec);
+    const exp = NEO.build(a.spec, ctxFor(a.spec));
+    a.export = { format: exp.format, filename: exp.filename, text: JSON.stringify(exp.json, null, 2) };
+    a.prevStatus = a.status === "paused" ? "paused" : "live";
+    a.version = v;
+    a.status = "updating";
+    a.updateNote = note;
+    state.draft = null;
+    save();
+    go("#/deploy/" + a.id);
+  }
+
+  function tabVersions(a) {
+    ensureVersions(a);
+    const cur = a.version || 1;
+    const running = (a.schedules || []).filter((x) => x.status === "running");
+    $("#tabBody").innerHTML = `
+      <div class="page-head" style="margin-bottom:14px">
+        <div><h2 style="font-size:20px">Versions</h2><p class="muted small" style="margin:4px 0 0">Every save publishes a new version. Restoring an older one publishes it again as the newest version.</p></div>
+        <a class="btn btn-primary" href="#/edit/${a.id}">✎ Edit agent</a>
+      </div>
+      <div class="card" style="overflow:hidden">
+        ${a.versions.map((x) => `
+          <div class="ver-row ${x.v === cur ? "current" : ""}">
+            <span class="ver-badge">v${x.v}</span>
+            <div class="ver-main"><b>${esc(x.note)}</b><div class="small muted">${new Date(x.at).toLocaleString([], { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })} · ${esc(x.by || "")}${running.some((r) => (r.version || 1) === x.v) ? " · used by a running schedule" : ""}</div></div>
+            ${x.v === cur ? `<span class="badge badge-ok"><span class="dot"></span> Live</span>` : `<button class="btn btn-soft btn-sm" data-restore="${x.v}">↺ Restore</button>`}
+          </div>`).join("")}
+      </div>`;
+    $$("[data-restore]").forEach((b) => (b.onclick = () => {
+      const v = +b.dataset.restore, x = a.versions.find((y) => y.v === v);
+      if (confirm(`Restore v${v}? It will be published as v${Math.max(...a.versions.map((y) => y.v)) + 1}.`)) republish(a, x.spec, `Restored v${v}`);
+    }));
   }
 
   const activeSpec = (spec) => ({ ...spec, metrics: spec.metrics.filter((m) => !m.off) });
@@ -808,14 +992,20 @@
         ["Running a test run", "passed"],
       ],
     };
-    const steps = stepsBy[s.channel];
+    const updating = agent.status === "updating" || agent.lastAction === "update";
+    const steps = updating ? [
+      [`Validating ${agent.export.format} file (v${agent.version})`, `${kb} KB · ${agent.updateNote || "changes"}`],
+      ["Updating the agent in NEO", `version ${agent.version} created`],
+      [`Publishing v${agent.version}`, `v${agent.version - 1} kept for rollback`],
+      ["Running a test conversation", "passed"],
+    ] : stepsBy[s.channel];
     app.innerHTML = shell("services", `
       <div class="page"><div class="deploy">
         <div class="crumbs"><a href="#/services">My Services</a> › Deploy</div>
         <div class="card deploy-card" id="dcard">
           <div style="display:flex;align-items:center;gap:12px">
             <div class="tpl-ic ic-${s.channel}" style="margin:0">${chIcon[s.channel]}</div>
-            <div><h2 style="font-size:20px">Deploying “${esc(s.name)}”</h2><div class="small muted">Importing <span class="mono">${esc(agent.export.filename)}</span> into NEO</div></div>
+            <div><h2 style="font-size:20px">${updating ? "Updating" : "Deploying"} “${esc(s.name)}”</h2><div class="small muted">${updating ? `Publishing version ${agent.version} to NEO` : `Importing <span class="mono">${esc(agent.export.filename)}</span> into NEO`}</div></div>
           </div>
           <div class="progress"><i id="bar"></i></div>
           <div class="small muted" style="margin-bottom:10px">Simulated, no live systems are called.</div>
@@ -824,7 +1014,7 @@
       </div></div>`);
     bindShell();
 
-    if (agent.status !== "deploying") return renderLive(agent);
+    if (agent.status !== "deploying" && agent.status !== "updating") return renderLive(agent);
     const per = 900;
     steps.forEach((st, i) => {
       later(() => { const el = $("#ds" + i); if (el) el.classList.add("active"); }, i * per);
@@ -834,7 +1024,12 @@
         $("#bar").style.width = ((i + 1) / steps.length) * 100 + "%";
       }, i * per + per - 100);
     });
-    later(() => { agent.status = "live"; save(); renderLive(agent); }, steps.length * per + 300);
+    later(() => {
+      agent.lastAction = agent.status === "updating" ? "update" : "deploy";
+      agent.status = agent.status === "updating" ? agent.prevStatus || "live" : "live";
+      save();
+      renderLive(agent);
+    }, steps.length * per + 300);
   }
 
   function renderLive(agent) {
@@ -842,11 +1037,13 @@
     $("#dcard").innerHTML = `
       <div class="success">
         <div class="big">✓</div>
-        <h2 style="font-size:24px">“${esc(s.name)}” is live</h2>
+        <h2 style="font-size:24px">${agent.lastAction === "update" ? `“${esc(s.name)}” is updated to v${agent.version}` : `“${esc(s.name)}” is live`}</h2>
+        ${agent.lastAction === "update" ? `<p class="muted" style="margin:6px 0 0">${esc(agent.updateNote || "")}.${agent.status === "paused" ? " The agent is still paused." : ""}</p>` : ""}
         <p class="muted" style="margin:6px 0 0">${s.channel === "voice" ? (s.direction === "inbound" ? "Customers can now call your AI hotline:" : "Your agent is ready to call customers from:") : s.channel === "chat" ? "Your chat widget is published and ready to embed." : "Your agentic flow is running in NEO."}</p>
         ${agent.phone ? `<div class="live-number">${agent.phone}</div><div class="small muted">Demo number, not a real line</div>` : ""}
         <div class="actions" style="justify-content:center;margin-top:24px">
           <a class="btn btn-ghost" href="#/agent/${agent.id}/overview">Open dashboard</a>
+          ${agent.lastAction === "update" ? `<a class="btn btn-ghost" href="#/agent/${agent.id}/versions">See versions</a>` : ""}
           ${canTrigger(agent) ? `<button class="btn btn-ghost" id="liveTrigger">⚡ Trigger</button>` : ""}
           <a class="btn btn-primary" href="#/agent/${agent.id}/test">${s.channel === "voice" ? "📞 Place a test call" : "💬 Try it now"}</a>
         </div>
@@ -872,16 +1069,16 @@
     if (selectedAgent && !myAgents().some((a) => a.id === selectedAgent)) selectedAgent = null;
     const rows = myAgents().map((a) => {
       const st = stats(a);
-      const statusBadge = a.status === "live" ? `<span class="badge badge-ok"><span class="dot pulse"></span> Live</span>` : a.status === "paused" ? `<span class="badge badge-gray"><span class="dot"></span> Paused</span>` : `<span class="badge badge-warn"><span class="dot pulse"></span> Deploying</span>`;
+      const statusBadge = a.status === "live" ? `<span class="badge badge-ok"><span class="dot pulse"></span> Live</span>` : a.status === "paused" ? `<span class="badge badge-gray"><span class="dot"></span> Paused</span>` : `<span class="badge badge-warn"><span class="dot pulse"></span> ${a.status === "updating" ? "Updating" : "Deploying"}</span>`;
       const sel = a.id === selectedAgent;
       return `<tr data-id="${a.id}" class="${sel ? "selected" : ""}">
         <td class="sel-cell"><input type="radio" name="agentSel" aria-label="Select ${esc(a.spec.name)}" ${sel ? "checked" : ""}></td>
-        <td><div style="display:flex;align-items:center;gap:12px"><div class="tpl-ic ic-${a.spec.channel}" style="margin:0;width:36px;height:36px;font-size:16px">${chIcon[a.spec.channel]}</div><div><b>${esc(a.spec.name)}</b><div class="small muted">${a.spec.source === "prompt" ? "✨ Generated from prompt" : "From template"}</div></div></div></td>
+        <td><div style="display:flex;align-items:center;gap:12px"><div class="tpl-ic ic-${a.spec.channel}" style="margin:0;width:36px;height:36px;font-size:16px">${chIcon[a.spec.channel]}</div><div><b>${esc(a.spec.name)}</b><div class="small muted">${a.spec.source === "prompt" ? "✨ Generated from prompt" : "From template"} · v${a.version || 1}</div></div></div></td>
         <td>${channelBadges(a.spec)}</td>
         <td>${statusBadge}</td>
         <td class="hide-sm">${scheduleBadge(a)}</td>
         <td class="hide-sm">${st.total.toLocaleString()}</td>
-        <td style="text-align:right"><a class="btn btn-ghost btn-sm" data-open href="#/${a.status === "deploying" ? "deploy/" + a.id : "agent/" + a.id + "/overview"}">Open</a></td>
+        <td style="text-align:right"><a class="btn btn-ghost btn-sm" data-open href="#/${a.status === "deploying" || a.status === "updating" ? "deploy/" + a.id : "agent/" + a.id + "/overview"}">Open</a></td>
       </tr>`;
     }).join("");
     app.innerHTML = shell("services", `
@@ -906,16 +1103,23 @@
       const btn = $("#triggerBtn"), hint = $("#selHint");
       btn.disabled = !(a && canTrigger(a));
       if (!hint) return;
-      if (!a) hint.innerHTML = `Select <b>one</b> agent, then click <b>Trigger</b> to upload contacts and schedule it.`;
+      if (!a) hint.innerHTML = `Select <b>one</b> agent, then click <b>Trigger</b> to upload contacts and schedule it. Double-click an agent to open it.`;
       else if (!triggerable(a)) hint.innerHTML = `<b>${esc(a.spec.name)}</b> answers incoming calls, so there's nothing to trigger.`;
       else if (a.status !== "live") hint.innerHTML = `<b>${esc(a.spec.name)}</b> is ${a.status}. Set it live to trigger it.`;
       else hint.innerHTML = `Selected: <b>${esc(a.spec.name)}</b>. Click <b>Trigger</b> to upload a CSV.`;
     };
-    $$(".svc-table tbody tr").forEach((tr) => (tr.onclick = (e) => {
-      if (e.target.closest("[data-open]")) return;
-      selectedAgent = tr.dataset.id;
-      refresh();
-    }));
+    $$(".svc-table tbody tr").forEach((tr) => {
+      tr.onclick = (e) => {
+        if (e.target.closest("[data-open]")) return;
+        selectedAgent = tr.dataset.id;
+        refresh();
+      };
+      tr.ondblclick = (e) => {
+        if (e.target.closest("[data-open]")) return;
+        const a = myAgents().find((x) => x.id === tr.dataset.id);
+        if (a) go(a.status === "deploying" || a.status === "updating" ? "#/deploy/" + a.id : "#/agent/" + a.id + "/overview");
+      };
+    });
     $("#triggerBtn").onclick = () => {
       const a = myAgents().find((x) => x.id === selectedAgent);
       if (a && canTrigger(a)) openTrigger(a, () => viewServices());
@@ -1105,7 +1309,7 @@
         const sched = {
           id: "sch_" + Math.random().toString(36).slice(2, 8), name: sc.name.trim(), file: t.file.name, count: t.file.rows.length,
           days: sc.days.slice(), start: sc.start, end: sc.end, immediate: sc.immediate,
-          status: sc.immediate ? "running" : "scheduled", done: 0, createdAt: Date.now(),
+          status: sc.immediate ? "running" : "scheduled", done: 0, createdAt: Date.now(), version: a.version || 1,
         };
         a.schedules = a.schedules || [];
         a.schedules.unshift(sched);
@@ -1160,10 +1364,11 @@
   function viewAgent(id, tab) {
     const a = myAgents().find((x) => x.id === id);
     if (!a) return go("#/services");
-    if (a.status === "deploying") return go("#/deploy/" + a.id);
+    if (a.status === "deploying" || a.status === "updating") return go("#/deploy/" + a.id);
     const s = a.spec;
     const tabs = [["overview", "Overview"], ["test", s.channel === "voice" ? "Test call" : "Try it"], ["logs", s.channel === "voice" ? "Call logs" : "Conversations"]];
     if (triggerable(a)) tabs.push(["schedules", `Schedules${(a.schedules || []).length ? ` (${a.schedules.length})` : ""}`]);
+    tabs.push(["versions", "Versions"]);
     tabs.push(["json", "NEO JSON"]);
     if (!tabs.some((t) => t[0] === tab)) tab = "overview";
 
@@ -1173,9 +1378,12 @@
         <div class="page-head">
           <div class="agent-head">
             <div class="tpl-ic ic-${s.channel}">${chIcon[s.channel]}</div>
-            <div><h1>${esc(s.name)}</h1><div style="margin-top:6px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">${channelBadges(s)} ${a.phone ? `<span class="badge badge-gray mono">${a.phone}</span>` : ""} <span class="small muted">Persona: ${esc(s.persona)} · ${NEO.LANGS[s.language].label}</span></div></div>
+            <div><h1>${esc(s.name)}</h1><div style="margin-top:6px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">${channelBadges(s)} ${a.phone ? `<span class="badge badge-gray mono">${a.phone}</span>` : ""} <span class="badge badge-gray">v${a.version || 1}</span> <span class="small muted">Persona: ${esc(s.persona)} · ${NEO.LANGS[s.language].label}</span></div></div>
           </div>
+          <div style="display:flex;align-items:center;gap:16px">
+          <a class="btn btn-ghost btn-sm" href="#/edit/${a.id}">✎ Edit</a>
           <label class="switch"><input type="checkbox" id="liveToggle" ${a.status === "live" ? "checked" : ""}><span class="tr"></span><span id="liveLabel">${a.status === "live" ? "Live" : "Paused"}</span></label>
+          </div>
         </div>
         <div class="card" style="margin-bottom:20px"><div class="tabs" style="border-bottom:0">${tabs.map(([k, l]) => `<button data-tab="${k}" class="${k === tab ? "on" : ""}">${l}</button>`).join("")}</div></div>
         <div id="tabBody"></div>
@@ -1184,7 +1392,7 @@
     $$("[data-tab]").forEach((b) => (b.onclick = () => go(`#/agent/${a.id}/${b.dataset.tab}`)));
     $("#liveToggle").onchange = (e) => { a.status = e.target.checked ? "live" : "paused"; $("#liveLabel").textContent = e.target.checked ? "Live" : "Paused"; save(); };
 
-    ({ overview: tabOverview, test: tabTest, logs: tabLogs, schedules: tabSchedules, json: tabJson })[tab](a);
+    ({ overview: tabOverview, test: tabTest, logs: tabLogs, schedules: tabSchedules, versions: tabVersions, json: tabJson })[tab](a);
   }
 
   function tabOverview(a) {
@@ -1352,7 +1560,7 @@
       const pct = Math.round((x.done / x.count) * 100), n = nums(x);
       return `<div class="card card-pad sch" data-sch="${x.id}">
         <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start">
-          <div><b class="sch-name">${esc(x.name)}</b> <span class="sch-badge">${badge(x)}</span>
+          <div><b class="sch-name">${esc(x.name)}</b> <span class="sch-badge">${badge(x)}</span> <span class="badge badge-gray" title="Agent version this schedule runs">v${x.version || 1}</span>
             <div class="small muted" style="margin-top:4px">📄 ${esc(x.file)} · ${x.count.toLocaleString()} ${unitFor(s)} · ${esc(daysText(x.days))} · ${esc(fmtDT(x.start))} → ${esc(fmtDT(x.end))}${x.immediate ? " · Started immediately" : ""}</div></div>
           ${x.status === "scheduled" ? `<button class="btn btn-soft btn-sm" data-run="${x.id}" title="Demo only: skip ahead to the start time">▶ Start now (demo)</button>` : ""}
         </div>
@@ -1414,13 +1622,15 @@
     switch (path) {
       case "login": case "register": case "welcome": return go("#/build");
       case "onboard": return viewOnboard();
-      case "build": return viewBuild();
+      case "build": return viewBuild(a === "all");
+      case "profile": return viewProfile();
       case "create": return viewCreate();
       case "generate": return viewGenerate();
       case "configure": return viewConfigure();
       case "deploy": return viewDeploy(a);
       case "services": return viewServices();
       case "agent": return viewAgent(a, b);
+      case "edit": { const ag = myAgents().find((x) => x.id === a); return ag ? startEdit(ag) : go("#/services"); }
       default: return go("#/build");
     }
   }

@@ -16,9 +16,9 @@ Start screen: **Existing Merchant** (demo login `ops@neofoodresto.com.ph`; the o
 ## What it shows
 
 1. **Register or sign in.** New merchants pick their business from a directory of 100 sample Philippine merchants (25 per industry) and verify a work email on its domain, in a simulated check. Existing merchants sign in with an email code. Each merchant only sees its own agents.
-2. **Build:** 10 voice-first templates each for Food Service, Retail, Banking/Lending and Healthcare come first. A "Want to build something else?" link leads to a prompt page, which generates a NEO import JSON and "imports" it.
-3. **My Services:** the merchant starts with three live agents. Select one and click **Trigger** to upload a CSV, then fill in NEO-style **Schedule Details** (name, days of week, period, Start Immediately). The required CSV headers are the agent's variables, mirroring NEO.
-4. **Each agent** has a test call or chat, call logs, schedules with simulated progress, and the generated JSON.
+2. **Build:** after sign-in, merchants land on the 10 voice-first templates for their industry (Food Service, Retail, Banking/Lending or Healthcare). **See all templates** shows all 40. The industry can be changed from **Profile**. A "Want to build something else?" link leads to a prompt page, which generates a NEO import JSON and "imports" it.
+3. **My Services:** the merchant starts with three live agents. Double-click one to open it, or select one and click **Trigger** to upload a CSV, then fill in NEO-style **Schedule Details** (name, days of week, period, Start Immediately). The required CSV headers are the agent's variables, mirroring NEO.
+4. **Each agent** has a test call or chat, call logs, schedules with simulated progress, and the generated JSON. Agents are **editable**: Save & republish creates a new version, and older versions can be restored. Running schedules keep the version they started with.
 
 ## Repository layout
 
