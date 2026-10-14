@@ -11,11 +11,11 @@ No install or build step is needed.
 - **Simplest:** open `merchant-studio/index.html` in a browser.
 - **On localhost:** run `merchant-studio/start.bat` (Windows) or `merchant-studio/start.command` (macOS/Linux). This serves the app on http://localhost:4173 using Node.js or Python.
 
-Demo login: `ops@neofoodresto.com.ph`. The one-time code appears in the simulated inbox pop-up.
+Start screen: **Existing Merchant** (demo login `ops@neofoodresto.com.ph`; the one-time code appears in the simulated inbox pop-up) or **Register Now** (search a sample merchant such as "Jollibee", then verify an email on its domain, e.g. `ops@jollibee.com.ph`).
 
 ## What it shows
 
-1. **Sign in with an email code.** Personal domains are rejected, and the merchant and industry are detected from the domain.
+1. **Register or sign in.** New merchants pick their business from a directory of 100 sample Philippine merchants (25 per industry) and verify a work email on its domain, in a simulated check. Existing merchants sign in with an email code. Each merchant only sees its own agents.
 2. **Build:** 10 voice-first templates each for Food Service, Retail, Banking/Lending and Healthcare come first. A "Want to build something else?" link leads to a prompt page, which generates a NEO import JSON and "imports" it.
 3. **My Services:** the merchant starts with three live agents. Select one and click **Trigger** to upload a CSV, then fill in NEO-style **Schedule Details** (name, days of week, period, Start Immediately). The required CSV headers are the agent's variables, mirroring NEO.
 4. **Each agent** has a test call or chat, call logs, schedules with simulated progress, and the generated JSON.
@@ -35,4 +35,5 @@ Demo login: `ops@neofoodresto.com.ph`. The one-time code appears in the simulate
 - **Generated NEO JSON** follows the structure of the samples. Credentials and workspace IDs are placeholders, the Globe telephony config is `<globe-telephony-provider>`, and flow files leave out component code. It has not been tested against a live NEO import.
 - **Prompt-to-agent** matches keywords; no AI model is called.
 - **Samples** in `neo-export-samples/` have keys, auth headers, credential references, internal hosts and workspace IDs replaced with `<redacted>`-style placeholders.
+- **Merchant directory:** the names are real Philippine businesses used for illustration only, with no affiliation implied. The domains are best guesses.
 - **Branding:** the Globe name and logo are trademarks of Globe Telecom. Styling follows Globe's site and its Kinetic design system. Globe's typeface (FS Elliot Pro) is licensed and not included.

@@ -20,11 +20,16 @@ Option B (runs on http://localhost:4173):
 
 DEMO SCRIPT (about 5 minutes)
 -----------------------------
-1. Sign in with  ops@neofoodresto.com.ph
-   - The verification code appears in the "Demo inbox" pop-up. Click "Use this code".
-   - Personal emails (gmail.com etc.) are rejected; other business domains work
-     and you pick the industry yourself.
-2. Confirm the business profile (NeoFoodResto, Food Service).
+1. Start screen: choose "Existing Merchant" or "Register Now".
+   - Existing Merchant: sign in with  ops@neofoodresto.com.ph  (pre-registered
+     demo account). The one-time code appears in the "Demo inbox" pop-up;
+     click "Use this code".
+   - Register Now: search for the business (e.g. "Jollibee", "BDO",
+     "Mercury Drug"; 100 sample merchants, 25 per industry), enter a work
+     email on that merchant's domain (e.g. ops@jollibee.com.ph), click Verify,
+     wait for the simulated check, then sign in with that email.
+   - Unregistered emails are told to register first; personal domains are rejected.
+2. Confirm the business profile (name and industry come from the directory).
 3. Build page: the merchant's industry templates come first.
    a. Template path: click "Post-order feedback call", tweak it, look at the
       Preview and NEO JSON tabs, then "Deploy to NEO".
@@ -36,7 +41,8 @@ DEMO SCRIPT (about 5 minutes)
    the NEO-style Schedule Details (name, days of week, period, Start Immediately).
    The required CSV headers are the agent's variables, as in NEO.
    Open an agent to place a test call, see call logs, and follow its Schedules.
-5. Use the merchant menu (top right) > "Reset demo data" to start over.
+5. Each merchant only sees its own agents. Use the merchant menu (top right) >
+   "Reset demo data" to clear agents and registrations and start over.
 
 
 BRANDING
@@ -47,6 +53,13 @@ are Globe Telecom trademarks: keep this mockup internal to OneByZero, or share
 it with Globe as part of a pitch. Do not share it more widely without Globe's OK.
 Globe's typeface (FS Elliot Pro) is licensed and not included; the page uses it
 if installed, otherwise the system font.
+
+
+MERCHANT DIRECTORY
+------------------
+The 100 merchant names are real Philippine businesses, used for illustration
+only (no affiliation implied). Their email domains are best guesses, and the
+domain "verification" is simulated.
 
 
 ABOUT THE GENERATED NEO JSON

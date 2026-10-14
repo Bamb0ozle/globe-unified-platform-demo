@@ -85,10 +85,9 @@
         <a href="#/build">${logo()}</a>
         <nav class="nav">
           <a href="#/build" class="${active === "build" ? "active" : ""}">Build</a>
-          <a href="#/services" class="${active === "services" ? "active" : ""}">My Services${state.agents.length ? `<span class="count">${state.agents.length}</span>` : ""}</a>
+          <a href="#/services" class="${active === "services" ? "active" : ""}">My Services${myAgents().length ? `<span class="count">${myAgents().length}</span>` : ""}</a>
         </nav>
         <div class="topbar-right">
-          <span class="mock-pill" title="All data and actions are simulated">Mockup</span>
           <div class="merchant-chip" id="chip">
             <div class="avatar">${esc(initials)}</div>
             <div class="who"><b>${esc(u.merchant)}</b><span class="muted">${esc(industry(u.industry).name)}</span></div>
@@ -113,14 +112,16 @@
     document.addEventListener("click", () => menu.classList.add("hidden"), { once: true });
     menu.addEventListener("click", (e) => {
       const act = e.target.dataset.act;
-      if (act === "logout") { state.user = null; state.draft = null; save(); go("#/login"); }
-      if (act === "reset") { if (confirm("Remove all demo services and sign out?")) { state = { user: null, agents: [], draft: null }; save(); go("#/login"); } }
+      if (act === "logout") { state.user = null; state.draft = null; save(); go("#/welcome"); }
+      if (act === "reset") { if (confirm("Remove all demo data (services and registrations) and sign out?")) { state = { user: null, agents: [], draft: null }; save(); go("#/welcome"); } }
       if (act === "industry") go("#/onboard");
     });
   }
 
-  // ---------- login ----------
-  function viewLogin() {
+  // ---------- welcome / login / register ----------
+  const isRegistered = (domain) => !!D.knownMerchants[domain] || (state.registered || []).some((r) => r.domain === domain);
+
+  function authShell() {
     app.innerHTML = `
       <div class="auth">
         <section class="auth-hero">
@@ -130,7 +131,7 @@
           <span class="shape ring" style="width:220px;height:110px;bottom:0;right:60px"></span>
           ${logo(true)}
           <h1>Launch AI voice agents for your business <span>in minutes.</span></h1>
-          <p class="lead">Pick a ready-made template for your industry, or describe what you need. Your agent runs on Globe's network, powered by NEO.</p>
+          <p class="lead">Pick a ready-made template for your industry, or describe what you need. Your agent runs on Globe's network.<br>Powered by NEO.</p>
           <div class="auth-points">
             <div class="auth-point"><span class="ic">📞</span><div><b>Voice-first.</b> Outbound campaigns and inbound hotlines on Globe telephony.</div></div>
             <div class="auth-point"><span class="ic">🧩</span><div><b>Templates for your industry.</b> Top use cases, ready to customize.</div></div>
@@ -141,22 +142,51 @@
         </section>
         <section class="auth-form"><div class="auth-box" id="authbox"></div></section>
       </div>`;
-    otp ? renderVerify() : renderEmail();
+    return $("#authbox");
   }
 
-  function renderEmail(prefill, err) {
-    const box = $("#authbox");
+  function viewWelcome() {
+    otp = null;
+    const box = authShell();
     box.innerHTML = `
-      <h2>Sign in or register</h2>
-      <p class="sub">Use your business email. We'll send a one-time code to verify your domain.</p>
+      <h2>Welcome to Globe AI Studio</h2>
+      <p class="sub">Build AI voice and chat agents for your business, powered by NEO.</p>
+      <div class="choice-list">
+        <a class="choice" href="#/login">
+          <span class="choice-ic">🏪</span>
+          <span><b>Existing Merchant</b><span class="muted">Sign in with your registered work email.</span></span>
+          <span class="choice-go">→</span>
+        </a>
+        <a class="choice choice-primary" href="#/register">
+          <span class="choice-ic">✨</span>
+          <span><b>Register Now</b><span>New to Globe AI Studio? Register your business.</span></span>
+          <span class="choice-go">→</span>
+        </a>
+      </div>
+      <p class="auth-foot">Globe Business merchants only.</p>`;
+  }
+
+  function viewLogin() {
+    authShell();
+    otp ? renderVerify() : renderEmail(state.pendingLogin || "");
+  }
+
+  function renderEmail(prefill, err, errHtml) {
+    const box = $("#authbox");
+    const justRegistered = state.pendingLogin && prefill === state.pendingLogin;
+    box.innerHTML = `
+      <a class="back-link" href="#/welcome">← Back</a>
+      <h2>Sign in</h2>
+      <p class="sub">Use your registered work email. We'll send a one-time code to verify it's you.</p>
+      ${justRegistered ? `<div class="notice ok">✓ Registration complete. Sign in with your work email.</div>` : ""}
       <form id="emailForm" novalidate>
-        <label class="field"><span>Work email</span>
-          <input class="input" id="email" type="email" placeholder="you@neofoodresto.com.ph" autocomplete="off" value="${esc(prefill || "")}" autofocus>
-          ${err ? `<div class="error">${esc(err)}</div>` : `<div class="hint">Try <a href="#" id="demoEmail">ops@neofoodresto.com.ph</a>, or any business domain.</div>`}
+        <label class="field ${err ? "has-error" : ""}"><span>Work email</span>
+          <input class="input" id="email" type="email" placeholder="you@yourcompany.com.ph" autocomplete="off" value="${esc(prefill || "")}" autofocus>
+          ${err ? `<div class="error">${esc(err)} ${errHtml || ""}</div>` : `<div class="hint">Demo account: <a href="#" id="demoEmail">ops@neofoodresto.com.ph</a></div>`}
         </label>
         <button class="btn btn-primary btn-lg" style="width:100%">Send verification code</button>
       </form>
-      <p class="auth-foot">New domains are registered automatically on first sign-in. Globe Business accounts only.</p>`;
+      <p class="auth-foot">New to Globe AI Studio? <a href="#/register">Register now</a></p>`;
     const demo = $("#demoEmail");
     if (demo) demo.onclick = (e) => { e.preventDefault(); $("#email").value = "ops@neofoodresto.com.ph"; $("#email").focus(); };
     $("#emailForm").onsubmit = (e) => {
@@ -164,12 +194,158 @@
       const email = $("#email").value.trim().toLowerCase();
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return renderEmail(email, "Enter a valid email address.");
       const domain = email.split("@")[1];
-      if (D.freeDomains.includes(domain)) return renderEmail(email, `Please use your business email. Personal domains like ${domain} can't be verified.`);
+      if (D.freeDomains.includes(domain)) return renderEmail(email, `Please use your work email. Personal domains like ${domain} can't be verified.`);
+      if (!isRegistered(domain)) {
+        const dm = D.merchantByDomain(domain);
+        state.regPrefill = dm ? dm.domain : null;
+        return renderEmail(email, dm ? `${dm.name} (${domain}) isn't registered yet.` : `${domain} isn't registered with Globe AI Studio.`, `<a href="#/register">Register now →</a>`);
+      }
       const code = String(Math.floor(100000 + Math.random() * 900000));
       otp = { email, code, merchant: D.detectMerchant(email) };
+      const reg = (state.registered || []).find((r) => r.domain === domain);
+      if (reg) Object.assign(otp.merchant, { name: reg.merchant, industry: reg.industry, detected: true });
+      state.pendingLogin = null;
       sendCodeToast();
       renderVerify();
     };
+  }
+
+  function viewRegister() {
+    const box = authShell();
+    const reg = { merchant: state.regPrefill ? D.merchantByDomain(state.regPrefill) : null, query: "", email: "", active: 0 };
+    state.regPrefill = null;
+    render();
+
+    function render(emailErr) {
+      const m = reg.merchant;
+      const taken = m && isRegistered(m.domain);
+      box.innerHTML = `
+        <a class="back-link" href="#/welcome">← Back</a>
+        <h2>Register your business</h2>
+        <p class="sub">Find your business in the Globe merchant directory, then verify your work email.</p>
+        <ol class="reg-steps"><li class="${m ? "done" : "on"}">Merchant</li><li class="${m && !taken ? "on" : ""}">Work email</li><li>Verify</li></ol>
+
+        <div class="reg-row">
+          <label class="reg-label" for="mSearch">Merchant Name <i>*</i></label>
+          ${m ? `
+            <div class="merchant-pick">
+              <span class="mp-ic">${industry(m.industry).icon}</span>
+              <span class="mp-txt"><b>${esc(m.name)}</b><span class="muted small">${esc(industry(m.industry).name)} · ${esc(m.domain)}</span></span>
+              <button class="btn-link small" id="changeMerchant">Change</button>
+            </div>` : `
+            <div class="search-wrap">
+              <span class="search-ic">🔍</span>
+              <input class="input search-input" id="mSearch" placeholder="Search your business name" autocomplete="off" value="${esc(reg.query)}" role="combobox" aria-expanded="false" aria-controls="mSuggest">
+              <div class="suggest hidden" id="mSuggest" role="listbox"></div>
+            </div>`}
+        </div>
+
+        ${taken ? `<div class="notice">${esc(m.name)} is already registered. <a href="#/login">Sign in instead →</a></div>` : ""}
+
+        ${m && !taken ? `
+          <form id="regForm" novalidate>
+            <div class="reg-row">
+              <label class="reg-label" for="regEmail">Work email <i>*</i></label>
+              <div>
+                <input class="input ${emailErr ? "input-err" : ""}" id="regEmail" type="email" placeholder="you@${esc(m.domain)}" autocomplete="off" value="${esc(reg.email)}">
+                ${emailErr ? `<div class="error">${esc(emailErr)}</div>` : `<div class="hint">Must be a <b>@${esc(m.domain)}</b> address.</div>`}
+              </div>
+            </div>
+            <button class="btn btn-primary btn-lg" style="width:100%;margin-top:8px">Verify</button>
+          </form>` : ""}
+        <p class="auth-foot">Already registered? <a href="#/login">Sign in</a></p>`;
+
+      if (!m) bindSearch();
+      else {
+        $("#changeMerchant").onclick = () => { reg.merchant = null; reg.query = ""; reg.email = ""; render(); setTimeout(() => $("#mSearch") && $("#mSearch").focus(), 0); };
+        const f = $("#regForm");
+        if (f) {
+          const em = $("#regEmail");
+          if (!reg.email) em.focus();
+          em.oninput = () => (reg.email = em.value);
+          f.onsubmit = (e) => { e.preventDefault(); verify(); };
+        }
+      }
+    }
+
+    function bindSearch() {
+      const input = $("#mSearch"), list = $("#mSuggest");
+      let results = [];
+      const show = () => {
+        reg.query = input.value;
+        results = D.searchMerchants(input.value, 6);
+        reg.active = 0;
+        if (!input.value.trim()) { list.classList.add("hidden"); input.setAttribute("aria-expanded", "false"); return; }
+        list.innerHTML = results.length
+          ? results.map((r, i) => `<button type="button" class="sg ${i === 0 ? "on" : ""}" role="option" data-i="${i}"><span class="sg-ic">${industry(r.industry).icon}</span><span class="sg-txt"><b>${hl(r.name, input.value)}</b><span>${esc(industry(r.industry).name)} · ${esc(r.domain)}</span></span></button>`).join("")
+          : `<div class="sg-empty">No merchant matches “${esc(input.value.trim())}”. Try <b>Jollibee</b>, <b>BDO</b> or <b>Mercury Drug</b>.</div>`;
+        list.classList.remove("hidden");
+        input.setAttribute("aria-expanded", "true");
+        $$(".sg", list).forEach((b) => (b.onmousedown = (e) => { e.preventDefault(); pick(results[+b.dataset.i]); }));
+      };
+      const move = (d) => {
+        const items = $$(".sg", list); if (!items.length) return;
+        reg.active = (reg.active + d + items.length) % items.length;
+        items.forEach((x, i) => x.classList.toggle("on", i === reg.active));
+      };
+      const pick = (m) => { reg.merchant = m; reg.query = m.name; render(); };
+      input.oninput = show;
+      input.onfocus = () => input.value.trim() && show();
+      input.onblur = () => setTimeout(() => list.classList.add("hidden"), 120);
+      input.onkeydown = (e) => {
+        if (e.key === "ArrowDown") { e.preventDefault(); move(1); }
+        else if (e.key === "ArrowUp") { e.preventDefault(); move(-1); }
+        else if (e.key === "Enter") { e.preventDefault(); if (results[reg.active]) pick(results[reg.active]); }
+        else if (e.key === "Escape") list.classList.add("hidden");
+      };
+      input.focus();
+      if (input.value.trim()) show();
+    }
+
+    function hl(name, q) {
+      const i = name.toLowerCase().indexOf(q.trim().toLowerCase());
+      if (i < 0 || !q.trim()) return esc(name);
+      return esc(name.slice(0, i)) + "<mark>" + esc(name.slice(i, i + q.trim().length)) + "</mark>" + esc(name.slice(i + q.trim().length));
+    }
+
+    function verify() {
+      const m = reg.merchant;
+      const email = reg.email.trim().toLowerCase();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return render("Enter a valid email address.");
+      const domain = email.split("@")[1];
+      if (D.freeDomains.includes(domain)) return render(`Personal domains like ${domain} can't be verified. Use your ${m.name} work email.`);
+      if (domain !== m.domain && !domain.endsWith("." + m.domain)) return render(`This email isn't on ${m.domain}. Use your ${m.name} work email.`);
+      reg.email = email;
+      const steps = [
+        ["Checking the email address", email],
+        [`Looking up mail records for ${m.domain}`, "MX records found (simulated)"],
+        ["Matching the domain to the Globe merchant directory", `${m.name} · ${industry(m.industry).name}`],
+        ["Creating your merchant account", "Registered"],
+      ];
+      box.innerHTML = `
+        <div class="verifying">
+          <div class="spinner-lg" id="vSpin"></div>
+          <h2 id="vTitle">Verifying now…</h2>
+          <p class="sub">Checking that <b>${esc(email)}</b> belongs to <b>${esc(m.name)}</b>.</p>
+          <div class="steps" style="text-align:left">${steps.map((s, i) => `<div class="step" id="vs${i}"><span class="st"></span><div>${esc(s[0])}<span class="log"></span></div></div>`).join("")}</div>
+          <div id="vDone"></div>
+        </div>`;
+      const per = 850;
+      steps.forEach((s, i) => {
+        later(() => { const el = $("#vs" + i); if (el) el.classList.add("active"); }, i * per);
+        later(() => { const el = $("#vs" + i); if (!el) return; el.classList.remove("active"); el.classList.add("done"); $(".st", el).textContent = "✓"; $(".log", el).textContent = s[1]; }, i * per + per - 120);
+      });
+      later(() => {
+        state.registered = state.registered || [];
+        state.registered.push({ merchant: m.name, domain: m.domain, industry: m.industry, email, at: Date.now() });
+        state.pendingLogin = email;
+        save();
+        $("#vSpin").outerHTML = `<div class="success"><div class="big">✓</div></div>`;
+        $("#vTitle").textContent = "You're registered!";
+        $("#vDone").innerHTML = `<p class="muted" style="margin:16px 0 14px">Taking you to sign in…</p><a class="btn btn-primary" href="#/login">Go to sign in now</a>`;
+        later(() => go("#/login"), 2600);
+      }, steps.length * per + 200);
+    }
   }
 
   function sendCodeToast() {
@@ -212,7 +388,7 @@
       go(state.user.industry && known ? "#/build" : "#/onboard");
     };
     $("#resend").onclick = (e) => { e.preventDefault(); otp.code = String(Math.floor(100000 + Math.random() * 900000)); sendCodeToast(); };
-    $("#changeEmail").onclick = (e) => { e.preventDefault(); const em = otp.email; otp = null; $$(".toast").forEach((t) => t.remove()); renderEmail(em); };
+    $("#changeEmail").onclick = (e) => { e.preventDefault(); otp = null; $$(".toast").forEach((t) => t.remove()); renderEmail(""); };
   }
 
   // ---------- onboarding ----------
@@ -574,17 +750,23 @@
       phone: spec.channel === "voice" ? `+63 2 8${Math.floor(r() * 900 + 100)} ${String(Math.floor(r() * 9000 + 1000))}` : null,
       export: { format: exp.format, filename: exp.filename, text: JSON.stringify(exp.json, null, 2) },
       schedules: [],
+      owner: state.user && state.user.domain,
     };
   }
+
+  // Each merchant only sees its own agents.
+  const myAgents = () => state.agents.filter((a) => !a.owner || (state.user && a.owner === state.user.domain));
 
   // Demo merchants start with three live agents from their industry:
   // two outbound voice agents and one chat agent.
   function seedAgents() {
-    if (state.seeded || !state.user || !state.user.industry) return;
+    if (!state.user || !state.user.industry) return;
+    state.seededFor = state.seededFor || [];
+    if (state.seededFor.includes(state.user.domain)) return;
     const ind = state.user.industry, list = D.templates[ind];
     const picks = [...list.filter((t) => t.channel === "voice" && t.direction === "outbound").slice(0, 2), list.find((t) => t.channel === "chat")].filter(Boolean);
     picks.forEach((t, i) => state.agents.push(makeAgent(specFromTemplate(ind, t), { status: "live", seed: t.id, createdAt: Date.now() - (i + 1) * 4 * 864e5 })));
-    state.seeded = true;
+    state.seededFor.push(state.user.domain);
     save();
   }
 
@@ -598,7 +780,7 @@
   }
 
   function viewDeploy(id) {
-    const agent = state.agents.find((a) => a.id === id);
+    const agent = myAgents().find((a) => a.id === id);
     if (!agent) return go("#/services");
     const s = agent.spec;
     const kb = (agent.export.text.length / 1024).toFixed(1);
@@ -687,8 +869,8 @@
   }
 
   function viewServices() {
-    if (selectedAgent && !state.agents.some((a) => a.id === selectedAgent)) selectedAgent = null;
-    const rows = state.agents.map((a) => {
+    if (selectedAgent && !myAgents().some((a) => a.id === selectedAgent)) selectedAgent = null;
+    const rows = myAgents().map((a) => {
       const st = stats(a);
       const statusBadge = a.status === "live" ? `<span class="badge badge-ok"><span class="dot pulse"></span> Live</span>` : a.status === "paused" ? `<span class="badge badge-gray"><span class="dot"></span> Paused</span>` : `<span class="badge badge-warn"><span class="dot pulse"></span> Deploying</span>`;
       const sel = a.id === selectedAgent;
@@ -711,7 +893,7 @@
             <button class="btn btn-primary" id="triggerBtn" disabled>⚡ Trigger</button>
           </div>
         </div>
-        ${state.agents.length ? `
+        ${myAgents().length ? `
           <div class="sel-hint" id="selHint"></div>
           <div class="card" style="overflow:auto"><table class="svc-table"><thead><tr><th style="width:44px"></th><th>Service</th><th>Type</th><th>Status</th><th class="hide-sm">Schedules</th><th class="hide-sm">Conversations (7d)</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`
           : `<div class="card empty"><div class="big">🎙️</div><h2 style="font-size:20px;margin:10px 0 6px">No services yet</h2><p class="muted">Build your first AI agent from a template or a prompt.</p><a class="btn btn-primary" href="#/build" style="margin-top:10px">Build your first agent</a></div>`}
@@ -719,7 +901,7 @@
     bindShell();
 
     const refresh = () => {
-      const a = state.agents.find((x) => x.id === selectedAgent);
+      const a = myAgents().find((x) => x.id === selectedAgent);
       $$(".svc-table tbody tr").forEach((tr) => { const on = tr.dataset.id === selectedAgent; tr.classList.toggle("selected", on); $("input", tr).checked = on; });
       const btn = $("#triggerBtn"), hint = $("#selHint");
       btn.disabled = !(a && canTrigger(a));
@@ -735,7 +917,7 @@
       refresh();
     }));
     $("#triggerBtn").onclick = () => {
-      const a = state.agents.find((x) => x.id === selectedAgent);
+      const a = myAgents().find((x) => x.id === selectedAgent);
       if (a && canTrigger(a)) openTrigger(a, () => viewServices());
     };
     refresh();
@@ -976,7 +1158,7 @@
 
   // ---------- agent detail ----------
   function viewAgent(id, tab) {
-    const a = state.agents.find((x) => x.id === id);
+    const a = myAgents().find((x) => x.id === id);
     if (!a) return go("#/services");
     if (a.status === "deploying") return go("#/deploy/" + a.id);
     const s = a.spec;
@@ -1220,12 +1402,17 @@
     clearTimers();
     $$(".modal-bg").forEach((m) => m.remove());
     const [path, a, b] = location.hash.replace(/^#\/?/, "").split("/");
-    if (!state.user) { if (path !== "login") return go("#/login"); return viewLogin(); }
+    if (!state.user) {
+      if (path === "login") return viewLogin();
+      if (path === "register") return viewRegister();
+      if (path !== "welcome") return go("#/welcome");
+      return viewWelcome();
+    }
     if (!state.user.industry && path !== "onboard") return go("#/onboard");
     seedAgents();
     window.scrollTo(0, 0);
     switch (path) {
-      case "login": return go("#/build");
+      case "login": case "register": case "welcome": return go("#/build");
       case "onboard": return viewOnboard();
       case "build": return viewBuild();
       case "create": return viewCreate();

@@ -460,9 +460,76 @@ window.GMS_DATA = (function () {
 
   const freeDomains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "icloud.com", "ymail.com", "proton.me", "protonmail.com"];
 
+  // Demo account that is already registered (sign-in works without registering).
   const knownMerchants = {
     "neofoodresto.com.ph": { name: "NeoFoodResto", industry: "food" },
   };
+
+  // Merchant directory used by "Register Now": 25 Philippine businesses per industry.
+  // Names are real brands for illustration only; domains are best guesses for the demo
+  // and the email "domain check" is simulated.
+  const directory = {
+    food: [
+      ["Jollibee", "jollibee.com.ph"], ["Chowking", "chowking.com.ph"], ["Greenwich", "greenwich.com.ph"],
+      ["Red Ribbon", "redribbonbakeshop.com.ph"], ["Mang Inasal", "manginasal.com"], ["McDonald's Philippines", "mcdonalds.com.ph"],
+      ["KFC Philippines", "kfc.com.ph"], ["Shakey's Pizza", "shakeyspizza.ph"], ["Max's Restaurant", "maxschicken.com"],
+      ["Goldilocks", "goldilocks.com.ph"], ["Army Navy Burger + Burrito", "armynavy.com.ph"], ["Yellow Cab Pizza", "yellowcabpizza.com"],
+      ["Bonchon Philippines", "bonchon.com.ph"], ["Starbucks Philippines", "starbucks.ph"], ["Tim Hortons Philippines", "timhortons.ph"],
+      ["Krispy Kreme Philippines", "krispykreme.com.ph"], ["Potato Corner", "potatocorner.com"], ["Gerry's Grill", "gerrysgrill.com"],
+      ["Cabalen", "cabalen.ph"], ["Pancake House", "pancakehouse.com.ph"], ["Tokyo Tokyo", "tokyotokyo.com.ph"],
+      ["Angel's Pizza", "angelspizza.com.ph"], ["Dunkin' Philippines", "dunkin.ph"], ["Burger King Philippines", "burgerking.com.ph"],
+      ["Kenny Rogers Roasters", "kennyrogers.com.ph"],
+    ],
+    retail: [
+      ["SM Store", "smstore.com.ph"], ["Robinsons Department Store", "robinsonsdepartmentstore.com.ph"], ["Puregold", "puregold.com.ph"],
+      ["National Book Store", "nationalbookstore.com"], ["Ace Hardware Philippines", "acehardware.ph"], ["Watsons Philippines", "watsons.com.ph"],
+      ["Lazada Philippines", "lazada.com.ph"], ["Shopee Philippines", "shopee.ph"], ["Zalora Philippines", "zalora.com.ph"],
+      ["Abenson", "abenson.com"], ["Anson's", "ansons.ph"], ["Octagon Computer Superstore", "octagon.com.ph"],
+      ["Bench", "bench.com.ph"], ["Penshoppe", "penshoppe.com"], ["Rustan's", "rustans.com"],
+      ["SM Supermarket", "smmarkets.ph"], ["Robinsons Supermarket", "robinsonssupermarket.com.ph"], ["AllHome", "allhome.com.ph"],
+      ["Wilcon Depot", "wilcon.com.ph"], ["MR.DIY Philippines", "mrdiy.com.ph"], ["Miniso Philippines", "miniso.com.ph"],
+      ["Toy Kingdom", "toykingdom.com.ph"], ["Metro Retail Stores", "metroretail.com.ph"], ["Handyman Do It Best", "handyman.com.ph"],
+      ["Landmark", "landmark.com.ph"],
+    ],
+    banking: [
+      ["BDO Unibank", "bdo.com.ph"], ["BPI", "bpi.com.ph"], ["Metrobank", "metrobank.com.ph"],
+      ["Landbank", "landbank.com"], ["PNB", "pnb.com.ph"], ["Security Bank", "securitybank.com"],
+      ["UnionBank", "unionbankph.com"], ["RCBC", "rcbc.com"], ["China Bank", "chinabank.ph"],
+      ["EastWest Bank", "eastwestbanker.com"], ["PSBank", "psbank.com.ph"], ["AUB (Asia United Bank)", "aub.com.ph"],
+      ["Maybank Philippines", "maybank.com.ph"], ["Robinsons Bank", "robinsonsbank.com.ph"], ["GoTyme Bank", "gotyme.com.ph"],
+      ["Maya Bank", "maya.ph"], ["Tonik Digital Bank", "tonikbank.com"], ["CIMB Bank Philippines", "cimbbank.com.ph"],
+      ["Home Credit Philippines", "homecredit.ph"], ["BillEase", "billease.ph"], ["Cebuana Lhuillier", "cebuanalhuillier.com"],
+      ["Palawan Pawnshop", "palawanpawnshop.com"], ["M Lhuillier", "mlhuillier.com"], ["Bank of Commerce", "bankcom.com.ph"],
+      ["DBP (Development Bank of the Philippines)", "dbp.ph"],
+    ],
+    healthcare: [
+      ["St. Luke's Medical Center", "stluke.com.ph"], ["The Medical City", "themedicalcity.com"], ["Makati Medical Center", "makatimed.net.ph"],
+      ["Asian Hospital and Medical Center", "asianhospital.com"], ["Cardinal Santos Medical Center", "cardinalsantos.com.ph"], ["Manila Doctors Hospital", "maniladoctors.com.ph"],
+      ["Chong Hua Hospital", "chonghua.com.ph"], ["Davao Doctors Hospital", "ddh.com.ph"], ["Capitol Medical Center", "capitolmedical.com.ph"],
+      ["Chinese General Hospital", "cghmc.com.ph"], ["QualiMed", "qualimed.com.ph"], ["Healthway Medical", "healthway.com.ph"],
+      ["Hi-Precision Diagnostics", "hi-precision.com.ph"], ["Mercury Drug", "mercurydrug.com"], ["Rose Pharmacy", "rosepharmacy.com"],
+      ["Southstar Drug", "southstardrug.com.ph"], ["The Generics Pharmacy", "tgp.com.ph"], ["Generika Drugstore", "generika.com.ph"],
+      ["Medicard Philippines", "medicardphils.com"], ["Maxicare", "maxicare.com.ph"], ["Intellicare", "intellicare.net.ph"],
+      ["PhilCare", "philcare.com.ph"], ["Belo Medical Group", "belomed.com"], ["Unilab", "unilab.com.ph"],
+      ["Aventus Medical Care", "aventusmedical.com.ph"],
+    ],
+  };
+  const merchants = Object.entries(directory).flatMap(([industry, list]) => list.map(([name, domain]) => ({ name, domain, industry })));
+
+  function searchMerchants(q, limit) {
+    const s = q.trim().toLowerCase();
+    if (!s) return [];
+    const scored = merchants.map((m) => {
+      const n = m.name.toLowerCase();
+      const words = n.split(/[\s().+'-]+/);
+      const score = n.startsWith(s) ? 0 : words.some((w) => w.startsWith(s)) ? 1 : n.includes(s) || m.domain.startsWith(s) ? 2 : 9;
+      return { m, score };
+    }).filter((x) => x.score < 9);
+    scored.sort((a, b) => a.score - b.score || a.m.name.localeCompare(b.m.name));
+    return scored.slice(0, limit || 6).map((x) => x.m);
+  }
+
+  const merchantByDomain = (domain) => merchants.find((m) => m.domain === domain);
 
   const industryHints = [
     ["food", ["pizza", "burger", "food", "resto", "restaurant", "cafe", "kitchen", "grill", "chicken", "bake", "coffee", "kain"]],
@@ -474,6 +541,8 @@ window.GMS_DATA = (function () {
   function detectMerchant(email) {
     const domain = (email.split("@")[1] || "").toLowerCase().trim();
     if (knownMerchants[domain]) return { domain, ...knownMerchants[domain], detected: true };
+    const dm = merchantByDomain(domain);
+    if (dm) return { domain, name: dm.name, industry: dm.industry, detected: true };
     const base = domain.split(".")[0] || "merchant";
     const name = base.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
     let industry = null;
@@ -550,5 +619,5 @@ window.GMS_DATA = (function () {
     return `sample ${f.replace(/_/g, " ")} ${i + 1}`;
   }
 
-  return { industries, templates, freeDomains, detectMerchant, examplePrompts, csvFieldsFor, sampleValue };
+  return { industries, templates, freeDomains, knownMerchants, merchants, searchMerchants, merchantByDomain, detectMerchant, examplePrompts, csvFieldsFor, sampleValue };
 })();
