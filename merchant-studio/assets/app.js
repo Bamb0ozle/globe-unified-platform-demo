@@ -102,7 +102,7 @@
         </div>
       </div></header>
       <main>${body}</main>
-      <footer class="footer"><div class="footer-inner"><img src="assets/globe-logo-white.png" alt="Globe"><span>Mockup for discussion only. No real email, NEO, or telephony calls are made.</span><span>Powered by <b>NEO</b> · OneByZero</span></div></footer>`;
+      <footer class="footer"><div class="footer-inner"><img src="assets/globe-logo-white.png" alt="Globe"><span>Mockup for discussion only. No real email, NEO, or telephony calls are made.</span><span class="credits">Powered by <img class="cr-neo" src="assets/neo-logo.svg" alt="NEO"><i class="cr-sep"></i><img class="cr-obz" src="assets/obz-mark-white.svg" alt="OneByZero"></span></div></footer>`;
   }
 
   function bindShell() {
@@ -138,7 +138,7 @@
             <div class="auth-point"><span class="ic">✨</span><div><b>Describe it, we build it.</b> Turn a prompt into a working agent.</div></div>
           </div>
           <div class="wave">${waveBars(48)}</div>
-          <div class="powered">Powered by NEO · OneByZero</div>
+          <div class="powered credits">Powered by <img class="cr-neo" src="assets/neo-logo.svg" alt="NEO"><i class="cr-sep"></i><img class="cr-obz-full" src="assets/obz-full-white.svg" alt="OneByZero"></div>
         </section>
         <section class="auth-form"><div class="auth-box" id="authbox"></div></section>
       </div>`;

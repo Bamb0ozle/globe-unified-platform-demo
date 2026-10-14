@@ -537,3 +537,17 @@ label.field.has-error > span { color: var(--danger); }
   .reg-row { grid-template-columns: 1fr; gap: 6px; }
   .reg-label { padding-top: 0; }
 }
+
+/* ---------- NEO / OneByZero credits ---------- */
+.credits { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; color: rgba(255, 255, 255, 0.72); }
+.credits img { display: block; width: auto; }
+.footer .credits img.cr-neo { height: 18px; }
+.footer .credits img.cr-obz { height: 17px; }
+.credits .cr-sep { width: 1px; height: 18px; background: rgba(255, 255, 255, 0.3); }
+.auth-hero .powered.credits { gap: 14px; font-size: 13px; }
+.auth-hero .credits img.cr-neo { height: 22px; }
+.auth-hero .credits img.cr-obz-full { height: 44px; }
+.auth-hero .credits .cr-sep { height: 30px; }
+/* keep the footer at the bottom on short pages */
+#app { min-height: 100vh; display: flex; flex-direction: column; }
+#app > main { flex: 1; }
