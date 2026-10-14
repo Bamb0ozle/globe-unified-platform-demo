@@ -491,5 +491,64 @@ window.GMS_DATA = (function () {
     "A workflow that looks up an order in our system, then calls the customer if it's delayed",
   ];
 
-  return { industries, templates, freeDomains, detectMerchant, examplePrompts };
+  // Variables each agent expects per contact. Like NEO, these become the
+  // required (case-sensitive) CSV headers when the agent is triggered.
+  const baseFields = {
+    voice: ["customer_phone", "customer_name"],
+    chat: ["customer_phone", "customer_name"],
+    flow: ["customer_name", "customer_phone", "request"],
+  };
+  const extraFields = {
+    "food-feedback": ["order_id", "order_date", "branch"],
+    "food-delay": ["order_id", "original_eta", "new_eta"],
+    "food-confirm": ["order_id", "order_items", "order_total", "delivery_address"],
+    "food-reservation": ["reservation_date", "party_size"],
+    "food-winback": ["last_order_date", "promo_code"],
+    "food-promo": ["promo_code", "promo_end_date"],
+    "food-complaint": ["ticket_id", "complaint_summary"],
+    "food-faq": ["preferred_branch"],
+    "food-catering": ["event_date", "guest_count"],
+    "retail-cart": ["cart_items", "cart_value", "checkout_link"],
+    "retail-csat": ["order_id", "delivery_date"],
+    "retail-loyalty": ["points_balance", "points_expiry"],
+    "retail-restock": ["product_name"],
+    "retail-cod": ["order_id", "order_total", "delivery_date"],
+    "bank-reminder": ["amount_due", "due_date"],
+    "bank-collections": ["amount_due", "days_past_due"],
+    "bank-activation": ["card_last4"],
+    "bank-fraud": ["transaction_amount", "merchant_name", "transaction_time"],
+    "bank-kyc": ["id_expiry_date"],
+    "bank-crosssell": ["offer_name"],
+    "hc-reminder": ["doctor_name", "appointment_time"],
+    "hc-labs": ["test_name"],
+    "hc-refill": ["medication_name"],
+    "hc-followup": ["visit_date"],
+    "hc-noshow": ["missed_appointment"],
+    "hc-vaccine": ["child_name", "vaccine_name", "due_date"],
+  };
+  function csvFieldsFor(spec) {
+    return [...baseFields[spec.channel], ...(extraFields[spec.templateId || spec.id] || [])];
+  }
+
+  // Fake but plausible sample values for the "Download Sample" CSV.
+  const sampleNames = ["Juan Dela Cruz", "Maria Santos", "Jose Reyes", "Ana Garcia", "Carlo Mendoza"];
+  function sampleValue(field, i) {
+    const f = field.toLowerCase();
+    if (f.includes("phone")) return "+63917" + String(i + 1).padStart(7, "0");
+    if (f === "customer_name" || f.endsWith("_name") && f !== "product_name" && f !== "test_name" && f !== "medication_name" && f !== "vaccine_name" && f !== "offer_name" && f !== "merchant_name") return sampleNames[i % sampleNames.length];
+    if (f.includes("date") || f.includes("expiry")) return `2026-10-${String(16 + i).padStart(2, "0")}`;
+    if (f === "new_eta") return ["10:40 AM", "2:15 PM", "7:30 PM"][i % 3];
+    if (f.includes("time") || f.includes("eta")) return ["10:00 AM", "1:30 PM", "6:45 PM"][i % 3];
+    if (f.endsWith("_id")) return f.startsWith("ticket") ? `TCK-${3100 + i}` : `ORD-${10240 + i}`;
+    if (/total|amount|value|balance/.test(f)) return ["1250.00", "980.50", "2430.00"][i % 3];
+    if (f.includes("size") || f.includes("count") || f.includes("days")) return String([4, 2, 6][i % 3]);
+    if (f.includes("link")) return `https://example.com/checkout/${1000 + i}`;
+    if (f.includes("code")) return ["WELCOME20", "BACK15", "TREAT10"][i % 3];
+    if (f === "card_last4") return ["4821", "1093", "7765"][i % 3];
+    if (f === "branch" || f === "preferred_branch") return ["Makati", "BGC", "Quezon City"][i % 3];
+    if (f === "request") return ["Catering for 50 guests", "Bulk order for office", "Event quote"][i % 3];
+    return `sample ${f.replace(/_/g, " ")} ${i + 1}`;
+  }
+
+  return { industries, templates, freeDomains, detectMerchant, examplePrompts, csvFieldsFor, sampleValue };
 })();

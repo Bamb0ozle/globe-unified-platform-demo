@@ -1,0 +1,11 @@
+# Raw NEO exports contain live credentials. Only the redacted copies in neo-export-samples/ are committed.
+/*.json
+
+# Build output (regenerate with package.ps1)
+dist/
+
+# Local tooling / scratch
+.claude/
+merchant-studio/_*
+Thumbs.db
+.DS_Store

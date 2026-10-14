@@ -16,10 +16,9 @@ Demo login: `ops@neofoodresto.com.ph`. The one-time code appears in the simulate
 ## What it shows
 
 1. **Sign in with an email code.** Personal domains are rejected, and the merchant and industry are detected from the domain.
-2. **"What do you want to build today?"**
-   - **Templates:** 10 voice-first use cases each for Food Service, Retail, Banking/Lending and Healthcare.
-   - **Prompt:** describe an agent, and the app generates a NEO import JSON and "imports" it.
-3. **After deploying:** a simulated deploy, a test call or chat, call logs, an outbound campaign (CSV with `customer_phone`), and the generated JSON.
+2. **Build:** 10 voice-first templates each for Food Service, Retail, Banking/Lending and Healthcare come first. A "Want to build something else?" link leads to a prompt page, which generates a NEO import JSON and "imports" it.
+3. **My Services:** the merchant starts with three live agents. Select one and click **Trigger** to upload a CSV, then fill in NEO-style **Schedule Details** (name, days of week, period, Start Immediately). The required CSV headers are the agent's variables, mirroring NEO.
+4. **Each agent** has a test call or chat, call logs, schedules with simulated progress, and the generated JSON.
 
 ## Repository layout
 

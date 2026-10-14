@@ -27,6 +27,7 @@
   const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
   const go = (hash) => { location.hash = hash; };
   const industry = (id) => D.industries.find((i) => i.id === id);
+  const slugify = (x) => String(x).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   const chIcon = { voice: "📞", chat: "💬", flow: "🧩" };
   const chName = { voice: "Voice", chat: "Chat", flow: "Agentic flow" };
   const ctxFor = (spec) => ({ merchant: state.user ? state.user.merchant : "Your Business", persona: spec.persona || "Joy", industryId: state.user && state.user.industry });
@@ -258,13 +259,44 @@
     const ind = homeFilter.industry || u.industry;
     app.innerHTML = shell("build", `
       <div class="page">
-        <section class="hero">
+        <div class="page-head">
+          <div><h1>${industry(ind).icon} Top use cases for ${esc(industry(ind).name)}</h1>
+          <p class="muted" style="margin:6px 0 0">Ready-made agents for ${esc(u.merchant)}. Pick one, adjust it, and deploy to NEO.</p></div>
+          <div class="controls" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <div class="seg" id="chFilter" style="background:#fff;border:1px solid var(--line)">
+              ${["all", "voice", "chat", "flow"].map((c) => `<button data-c="${c}" class="${homeFilter.channel === c ? "on" : ""}">${c === "all" ? "All" : chName[c]}</button>`).join("")}
+            </div>
+            <select class="select-sm" id="indSel">
+              ${D.industries.filter((i) => i.live).map((i) => `<option value="${i.id}" ${i.id === ind ? "selected" : ""}>${i.name}${i.id === u.industry ? " (yours)" : ""}</option>`).join("")}
+            </select>
+          </div>
+        </div>
+        <div class="tpl-grid">${templateCards(ind)}</div>
+        <a class="build-else" href="#/create">
+          <span class="be-ic">✨</span>
+          <span><b>Want to build something else?</b> <span class="muted">Describe it in your own words.</span></span>
+          <span class="be-cta">Click here →</span>
+        </a>
+      </div>`);
+    bindShell();
+    $("#chFilter").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; homeFilter.channel = b.dataset.c; viewBuild(); };
+    $("#indSel").onchange = (e) => { homeFilter.industry = e.target.value; viewBuild(); };
+    $$(".tpl").forEach((t) => (t.onclick = () => useTemplate(t.dataset.ind, t.dataset.id)));
+  }
+
+  // ---------- create from prompt ----------
+  function viewCreate() {
+    const u = state.user;
+    app.innerHTML = shell("build", `
+      <div class="page">
+        <div class="crumbs"><a href="#/build">Build</a> › Create something else</div>
+        <section class="hero" style="margin-top:12px">
           <span class="shape pill-y" style="width:220px;height:84px;top:0;right:0;opacity:.95"></span>
           <span class="shape circle-m" style="width:64px;height:64px;top:96px;right:46px"></span>
           <span class="shape pill-t" style="width:240px;height:80px;bottom:0;left:0;opacity:.9"></span>
           <span class="shape circle-a" style="width:120px;height:120px;bottom:-50px;right:18%;opacity:.55"></span>
           <h1>What do you want to build today?</h1>
-          <p class="sub">Describe it in plain words and we'll generate a NEO agent for ${esc(u.merchant)}, or start from a template below.</p>
+          <p class="sub">Describe it in plain words and we'll generate a NEO agent for ${esc(u.merchant)}.</p>
           <div class="prompt-box">
             <textarea id="prompt" placeholder="e.g. ${esc(D.examplePrompts[0])}">${esc(state.draftPrompt || "")}</textarea>
             <div class="prompt-bar">
@@ -276,25 +308,12 @@
           </div>
           <div class="chips">${D.examplePrompts.map((p) => `<button class="chip" data-p="${esc(p)}">${esc(p.length > 62 ? p.slice(0, 60) + "…" : p)}</button>`).join("")}</div>
         </section>
-
-        <div class="or-sep">or start from a template</div>
-
-        <div class="tpl-head">
-          <h2>${industry(ind).icon} Top use cases for ${esc(industry(ind).name)}</h2>
-          <div class="controls">
-            <div class="seg" id="chFilter">
-              ${["all", "voice", "chat", "flow"].map((c) => `<button data-c="${c}" class="${homeFilter.channel === c ? "on" : ""}">${c === "all" ? "All" : chName[c]}</button>`).join("")}
-            </div>
-            <select class="select-sm" id="indSel">
-              ${D.industries.filter((i) => i.live).map((i) => `<option value="${i.id}" ${i.id === ind ? "selected" : ""}>${i.name}${i.id === u.industry ? " (yours)" : ""}</option>`).join("")}
-            </select>
-          </div>
-        </div>
-        <div class="tpl-grid">${templateCards(ind)}</div>
+        <p class="muted small" style="text-align:center">Prefer a ready-made agent? <a href="#/build">Browse templates for ${esc(industry(u.industry).name)}</a></p>
       </div>`);
     bindShell();
 
     const prompt = $("#prompt");
+    prompt.focus();
     $("#mode").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; homeFilter.mode = b.dataset.m; $$("#mode button").forEach((x) => x.classList.toggle("on", x === b)); };
     $$(".chip").forEach((c) => (c.onclick = () => { prompt.value = c.dataset.p; prompt.focus(); }));
     prompt.addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) $("#genBtn").click(); });
@@ -304,13 +323,11 @@
       state.draftPrompt = p;
       const { spec, reasons } = NEO.specFromPrompt(p, homeFilter.mode, u.industry);
       spec.persona = "Joy";
+      spec.csvFields = D.csvFieldsFor(spec);
       state.draft = { spec, reasons, fresh: true };
       save();
       go("#/generate");
     };
-    $("#chFilter").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; homeFilter.channel = b.dataset.c; viewBuild(); };
-    $("#indSel").onchange = (e) => { homeFilter.industry = e.target.value; viewBuild(); };
-    $$(".tpl").forEach((t) => (t.onclick = () => useTemplate(t.dataset.ind, t.dataset.id)));
   }
 
   function templateCards(ind) {
@@ -325,10 +342,15 @@
       </button>`).join("") || `<p class="muted">No templates for this filter.</p>`;
   }
 
-  function useTemplate(ind, id) {
-    const t = D.templates[ind].find((x) => x.id === id);
+  function specFromTemplate(ind, t) {
     const spec = JSON.parse(JSON.stringify(t));
     Object.assign(spec, { persona: "Joy", language: ind === "banking" && t.id === "bank-faq" ? "taglish" : "en", purpose: t.blurb, source: "template", templateId: t.id, industryId: ind });
+    spec.csvFields = D.csvFieldsFor(spec);
+    return spec;
+  }
+
+  function useTemplate(ind, id) {
+    const spec = specFromTemplate(ind, D.templates[ind].find((x) => x.id === id));
     state.draft = { spec, reasons: null };
     save();
     go("#/configure");
@@ -347,7 +369,7 @@
     ];
     app.innerHTML = shell("build", `
       <div class="page">
-        <div class="crumbs"><a href="#/build">Build</a> › Generate from prompt</div>
+        <div class="crumbs"><a href="#/build">Build</a> › <a href="#/create">Create something else</a> › Generate</div>
         <div class="page-head"><h1>✨ Generating your agent</h1></div>
         <div class="gen-prompt">“${esc(spec.purpose)}”</div>
         <div id="genArea">
@@ -383,7 +405,7 @@
           <div class="section-title">Conversation steps</div>
           <div class="stage-list">${spec.stages.map((s, i) => `<div class="stage"><span class="num">${i + 1}</span><span>${esc(s)}</span></div>`).join("")}</div>
           <div class="actions">
-            <a class="btn btn-ghost" href="#/build">← Edit prompt</a>
+            <a class="btn btn-ghost" href="#/create">← Edit prompt</a>
             <a class="btn btn-ghost" href="#/configure">Customize</a>
             <button class="btn btn-primary" id="importBtn">Import into NEO →</button>
           </div>
@@ -541,17 +563,33 @@
   }
 
   // ---------- deploy ----------
-  function startDeploy() {
-    const spec = activeSpec(state.draft.spec);
+  function makeAgent(spec, opts) {
+    opts = opts || {};
+    spec.csvFields = spec.csvFields || D.csvFieldsFor(spec);
     const exp = NEO.build(spec, ctxFor(spec));
-    const r = rng(hash(spec.name + Date.now()));
-    const agent = {
+    const r = rng(hash(spec.name + (opts.seed || Date.now())));
+    return {
       id: "ag_" + Math.random().toString(36).slice(2, 10),
-      spec, createdAt: Date.now(), status: "deploying",
+      spec, createdAt: opts.createdAt || Date.now(), status: opts.status || "deploying",
       phone: spec.channel === "voice" ? `+63 2 8${Math.floor(r() * 900 + 100)} ${String(Math.floor(r() * 9000 + 1000))}` : null,
       export: { format: exp.format, filename: exp.filename, text: JSON.stringify(exp.json, null, 2) },
-      campaign: null,
+      schedules: [],
     };
+  }
+
+  // Demo merchants start with three live agents from their industry:
+  // two outbound voice agents and one chat agent.
+  function seedAgents() {
+    if (state.seeded || !state.user || !state.user.industry) return;
+    const ind = state.user.industry, list = D.templates[ind];
+    const picks = [...list.filter((t) => t.channel === "voice" && t.direction === "outbound").slice(0, 2), list.find((t) => t.channel === "chat")].filter(Boolean);
+    picks.forEach((t, i) => state.agents.push(makeAgent(specFromTemplate(ind, t), { status: "live", seed: t.id, createdAt: Date.now() - (i + 1) * 4 * 864e5 })));
+    state.seeded = true;
+    save();
+  }
+
+  function startDeploy() {
+    const agent = makeAgent(activeSpec(state.draft.spec));
     state.agents.unshift(agent);
     state.draft = null;
     state.draftPrompt = "";
@@ -627,39 +665,299 @@
         ${agent.phone ? `<div class="live-number">${agent.phone}</div><div class="small muted">Demo number, not a real line</div>` : ""}
         <div class="actions" style="justify-content:center;margin-top:24px">
           <a class="btn btn-ghost" href="#/agent/${agent.id}/overview">Open dashboard</a>
-          ${s.channel === "voice" && s.direction === "outbound" ? `<a class="btn btn-ghost" href="#/agent/${agent.id}/campaign">Upload customer list</a>` : ""}
+          ${canTrigger(agent) ? `<button class="btn btn-ghost" id="liveTrigger">⚡ Trigger</button>` : ""}
           <a class="btn btn-primary" href="#/agent/${agent.id}/test">${s.channel === "voice" ? "📞 Place a test call" : "💬 Try it now"}</a>
         </div>
       </div>`;
+    const tb = $("#liveTrigger");
+    if (tb) tb.onclick = () => openTrigger(agent);
   }
 
   // ---------- services ----------
+  let selectedAgent = null;
+  const triggerable = (a) => !(a.spec.channel === "voice" && a.spec.direction === "inbound");
+  const canTrigger = (a) => a.status === "live" && triggerable(a);
+
+  function scheduleBadge(a) {
+    const sch = a.schedules || [];
+    if (!sch.length) return `<span class="muted small">-</span>`;
+    if (sch.some((x) => x.status === "running")) return `<span class="badge badge-ok"><span class="dot pulse"></span> Running</span>`;
+    const next = sch.filter((x) => x.status === "scheduled").length;
+    return next ? `<span class="badge badge-voice">🗓 ${next} scheduled</span>` : `<span class="badge badge-gray">${sch.length} completed</span>`;
+  }
+
   function viewServices() {
+    if (selectedAgent && !state.agents.some((a) => a.id === selectedAgent)) selectedAgent = null;
     const rows = state.agents.map((a) => {
       const st = stats(a);
       const statusBadge = a.status === "live" ? `<span class="badge badge-ok"><span class="dot pulse"></span> Live</span>` : a.status === "paused" ? `<span class="badge badge-gray"><span class="dot"></span> Paused</span>` : `<span class="badge badge-warn"><span class="dot pulse"></span> Deploying</span>`;
-      return `<tr data-id="${a.id}">
+      const sel = a.id === selectedAgent;
+      return `<tr data-id="${a.id}" class="${sel ? "selected" : ""}">
+        <td class="sel-cell"><input type="radio" name="agentSel" aria-label="Select ${esc(a.spec.name)}" ${sel ? "checked" : ""}></td>
         <td><div style="display:flex;align-items:center;gap:12px"><div class="tpl-ic ic-${a.spec.channel}" style="margin:0;width:36px;height:36px;font-size:16px">${chIcon[a.spec.channel]}</div><div><b>${esc(a.spec.name)}</b><div class="small muted">${a.spec.source === "prompt" ? "✨ Generated from prompt" : "From template"}</div></div></div></td>
         <td>${channelBadges(a.spec)}</td>
         <td>${statusBadge}</td>
-        <td class="hide-sm mono small">${a.phone || "-"}</td>
+        <td class="hide-sm">${scheduleBadge(a)}</td>
         <td class="hide-sm">${st.total.toLocaleString()}</td>
-        <td class="hide-sm small muted">${new Date(a.createdAt).toLocaleDateString()}</td>
+        <td style="text-align:right"><a class="btn btn-ghost btn-sm" data-open href="#/${a.status === "deploying" ? "deploy/" + a.id : "agent/" + a.id + "/overview"}">Open</a></td>
       </tr>`;
     }).join("");
     app.innerHTML = shell("services", `
       <div class="page">
-        <div class="page-head"><div><h1>My Services</h1><p class="muted" style="margin:4px 0 0">Agents running for ${esc(state.user.merchant)}.</p></div><a class="btn btn-primary" href="#/build">+ Build new</a></div>
-        ${state.agents.length ? `<div class="card" style="overflow:auto"><table class="svc-table"><thead><tr><th>Service</th><th>Type</th><th>Status</th><th class="hide-sm">Number</th><th class="hide-sm">Conversations (7d)</th><th class="hide-sm">Created</th></tr></thead><tbody>${rows}</tbody></table></div>`
+        <div class="page-head">
+          <div><h1>My Services</h1><p class="muted" style="margin:4px 0 0">Agents running for ${esc(state.user.merchant)}.</p></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <a class="btn btn-ghost" href="#/build">+ Build new</a>
+            <button class="btn btn-primary" id="triggerBtn" disabled>⚡ Trigger</button>
+          </div>
+        </div>
+        ${state.agents.length ? `
+          <div class="sel-hint" id="selHint"></div>
+          <div class="card" style="overflow:auto"><table class="svc-table"><thead><tr><th style="width:44px"></th><th>Service</th><th>Type</th><th>Status</th><th class="hide-sm">Schedules</th><th class="hide-sm">Conversations (7d)</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`
           : `<div class="card empty"><div class="big">🎙️</div><h2 style="font-size:20px;margin:10px 0 6px">No services yet</h2><p class="muted">Build your first AI agent from a template or a prompt.</p><a class="btn btn-primary" href="#/build" style="margin-top:10px">Build your first agent</a></div>`}
       </div>`);
     bindShell();
-    $$(".svc-table tbody tr").forEach((tr) => (tr.onclick = () => {
-      const a = state.agents.find((x) => x.id === tr.dataset.id);
-      go(a.status === "deploying" ? "#/deploy/" + a.id : "#/agent/" + a.id + "/overview");
+
+    const refresh = () => {
+      const a = state.agents.find((x) => x.id === selectedAgent);
+      $$(".svc-table tbody tr").forEach((tr) => { const on = tr.dataset.id === selectedAgent; tr.classList.toggle("selected", on); $("input", tr).checked = on; });
+      const btn = $("#triggerBtn"), hint = $("#selHint");
+      btn.disabled = !(a && canTrigger(a));
+      if (!hint) return;
+      if (!a) hint.innerHTML = `Select <b>one</b> agent, then click <b>Trigger</b> to upload contacts and schedule it.`;
+      else if (!triggerable(a)) hint.innerHTML = `<b>${esc(a.spec.name)}</b> answers incoming calls, so there's nothing to trigger.`;
+      else if (a.status !== "live") hint.innerHTML = `<b>${esc(a.spec.name)}</b> is ${a.status}. Set it live to trigger it.`;
+      else hint.innerHTML = `Selected: <b>${esc(a.spec.name)}</b>. Click <b>Trigger</b> to upload a CSV.`;
+    };
+    $$(".svc-table tbody tr").forEach((tr) => (tr.onclick = (e) => {
+      if (e.target.closest("[data-open]")) return;
+      selectedAgent = tr.dataset.id;
+      refresh();
     }));
+    $("#triggerBtn").onclick = () => {
+      const a = state.agents.find((x) => x.id === selectedAgent);
+      if (a && canTrigger(a)) openTrigger(a, () => viewServices());
+    };
+    refresh();
   }
 
+  // ---------- trigger: CSV upload -> NEO-style schedule ----------
+  const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const unitFor = (s) => (s.channel === "flow" ? "records" : "contacts");
+
+  function parseCsv(text) {
+    const lines = String(text).replace(/^﻿/, "").split(/\r?\n/).filter((l) => l.trim());
+    const row = (line) => {
+      const out = []; let cur = "", q = false;
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (q) { if (c === '"' && line[i + 1] === '"') { cur += '"'; i++; } else if (c === '"') q = false; else cur += c; }
+        else if (c === '"') q = true; else if (c === ",") { out.push(cur); cur = ""; } else cur += c;
+      }
+      out.push(cur);
+      return out.map((x) => x.trim());
+    };
+    const headers = lines.length ? row(lines[0]) : [];
+    return { headers, rows: lines.slice(1).map(row) };
+  }
+
+  function sampleCsv(fields, n) {
+    const q = (v) => (/[",]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
+    const rows = Array.from({ length: n }, (_, i) => fields.map((f) => q(D.sampleValue(f, i))).join(","));
+    return [fields.join(","), ...rows].join("\n") + "\n";
+  }
+
+  const fmtDT = (v) => (v ? new Date(v).toLocaleString([], { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }) : "");
+  const localISO = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+  const daysText = (d) => (d.length === 7 ? "Every day" : d.join(",") === DAYS.slice(0, 5).join(",") ? "Weekdays" : d.map((x) => x.slice(0, 3)).join(", "));
+
+  function openTrigger(a, onClose) {
+    const s = a.spec;
+    const fields = s.csvFields || D.csvFieldsFor(s);
+    const t = { file: null, error: null, sch: { name: "", days: [], start: "", end: "", immediate: false } };
+    const bg = document.createElement("div");
+    bg.className = "modal-bg";
+    bg.innerHTML = `<div class="card modal modal-wide" role="dialog" aria-modal="true"></div>`;
+    document.body.appendChild(bg);
+    const box = $(".modal", bg);
+    let created = false;
+    const onKey = (e) => { if (e.key === "Escape") close(); };
+    const close = () => { bg.remove(); document.removeEventListener("keydown", onKey); if (created && onClose) onClose(); };
+    document.addEventListener("keydown", onKey);
+    bg.addEventListener("mousedown", (e) => { if (e.target === bg) close(); });
+
+    const missing = () => (t.file ? fields.filter((f) => !t.file.headers.includes(f)) : fields);
+    const valid = () => !!t.file && !missing().length && t.file.rows.length > 0;
+    const chips = () => fields.map((f) => {
+      if (!t.file) return `<span class="hchip">${esc(f)}</span>`;
+      const ok = t.file.headers.includes(f);
+      return `<span class="hchip ${ok ? "ok" : "missing"}">${ok ? "✓" : "✕"} ${esc(f)}</span>`;
+    }).join("");
+    const fileLine = () => `<div class="ua-file">📄 <b>${esc(t.file.name)}</b> · ${t.file.rows.length.toLocaleString()} ${unitFor(s)}</div>`;
+
+    function renderUpload() {
+      const miss = missing();
+      box.innerHTML = `
+        <div class="m-head">
+          <div class="m-title"><span class="m-ic">⚡</span><div><h2>Trigger agent</h2><div class="m-sub">${esc(s.name)} ${channelBadges(s)}</div></div></div>
+          <button class="icon-btn" data-x title="Close">✕</button>
+        </div>
+        <div class="m-body">
+          <p class="muted" style="margin:0 0 14px">Upload a CSV with one row per ${s.channel === "voice" ? "person to call" : s.channel === "chat" ? "person to message" : "record to process"}. Each column fills one of the agent's variables.</p>
+          <div class="upload-area ${t.file ? (valid() ? "ok" : "bad") : ""}">
+            <div class="ua-btns">
+              <label class="btn btn-outline btn-sm">⤒ Choose File<input type="file" accept=".csv,text/csv" id="csvIn" hidden></label>
+              <button class="btn btn-soft btn-sm" id="dlSample">⤓ Download Sample</button>
+            </div>
+            ${t.file ? fileLine() : `<b class="ua-title">Upload a file containing contact information</b>`}
+            <div class="small muted">Supported formats: .csv</div>
+            <div class="ua-req">Required CSV Headers (case-sensitive)</div>
+            <div class="hchips">${chips()}</div>
+          </div>
+          ${t.error ? `<div class="error">${esc(t.error)}</div>` : ""}
+          ${t.file && miss.length ? `<div class="error">Missing ${miss.length === 1 ? "header" : "headers"}: ${miss.map(esc).join(", ")}. Headers are case-sensitive.</div>` : ""}
+          ${t.file && !miss.length && !t.file.rows.length ? `<div class="error">The file has headers but no rows.</div>` : ""}
+          ${valid() ? previewTable() : ""}
+          ${t.file ? "" : `<button class="btn-link small" id="useSample" style="margin-top:12px">No file handy? Use a sample list (demo)</button>`}
+        </div>
+        <div class="m-foot">
+          <button class="btn btn-ghost" data-x>Cancel</button>
+          <button class="btn btn-primary" id="toSchedule" ${valid() ? "" : "disabled"}>🗓 Schedule</button>
+        </div>`;
+      bindCommon();
+      $("#csvIn", box).onchange = (e) => {
+        const f = e.target.files[0]; if (!f) return;
+        if (!/\.csv$/i.test(f.name)) { t.error = "Please choose a .csv file."; t.file = null; return renderUpload(); }
+        const rd = new FileReader();
+        rd.onload = () => { const p = parseCsv(rd.result); t.error = null; t.file = { name: f.name, headers: p.headers, rows: p.rows }; renderUpload(); };
+        rd.readAsText(f);
+      };
+      $("#dlSample", box).onclick = () => download(`${slugify(s.name)}-sample.csv`, sampleCsv(fields, 3), "text/csv");
+      const us = $("#useSample", box);
+      if (us) us.onclick = () => { const p = parseCsv(sampleCsv(fields, 250)); t.file = { name: "sample-contacts.csv", headers: p.headers, rows: p.rows }; renderUpload(); };
+      $("#toSchedule", box).onclick = () => { if (valid()) renderSchedule(); };
+    }
+
+    function previewTable() {
+      const cols = t.file.headers;
+      return `<div class="preview"><div class="small muted" style="margin-bottom:6px">Preview (first 3 of ${t.file.rows.length.toLocaleString()})</div>
+        <div style="overflow:auto"><table class="svc-table mini"><thead><tr>${cols.map((c) => `<th>${esc(c)}</th>`).join("")}</tr></thead>
+        <tbody>${t.file.rows.slice(0, 3).map((r) => `<tr>${cols.map((_, i) => `<td>${esc(r[i] || "")}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+    }
+
+    function renderSchedule(err) {
+      err = err || {};
+      const sc = t.sch;
+      const period = sc.start && sc.end ? `${fmtDT(sc.start)}  →  ${fmtDT(sc.end)}` : "";
+      box.innerHTML = `
+        <div class="m-head">
+          <div class="m-title"><span class="m-ic">📋</span><h2>Schedule Details</h2></div>
+          <div style="display:flex;gap:8px"><button class="btn btn-ghost" data-x>Cancel</button><button class="btn btn-primary" id="createBtn">💾 Create</button></div>
+        </div>
+        <div class="m-body">
+          <div class="m-sec">Basic Information</div>
+          <div class="nf ${err.name ? "has-err" : ""}"><label for="schName">Schedule Name <i>*</i></label>
+            <input class="input" id="schName" placeholder="Enter schedule name" value="${esc(sc.name)}">
+            ${err.name ? `<div class="error">${err.name}</div>` : ""}</div>
+          <div class="nf"><label>CSV File Upload <i>*</i></label>
+            <div class="upload-area ok compact">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">${fileLine()}<button class="btn-link small" id="changeFile">Change file</button></div>
+              <div class="ua-req">Required CSV Headers (case-sensitive)</div>
+              <div class="hchips">${chips()}</div>
+            </div></div>
+          <div class="m-sec">Schedule Configuration</div>
+          <div class="nf ${err.days ? "has-err" : ""}">
+            <div class="nf-row"><label>Days of Week <i>*</i></label><div style="display:flex;gap:6px"><button class="btn btn-soft btn-sm" id="allDays">Select All</button><button class="btn btn-soft btn-sm" id="weekdays">Weekdays Only</button></div></div>
+            <div class="days">${DAYS.map((d) => `<label class="day"><input type="checkbox" value="${d}" ${sc.days.includes(d) ? "checked" : ""}> ${d}</label>`).join("")}</div>
+            ${err.days ? `<div class="error">${err.days}</div>` : ""}</div>
+          <div class="nf ${err.period ? "has-err" : ""}"><label>Schedule Period <i>*</i></label>
+            <div class="period">
+              <button type="button" class="period-field" id="periodBtn"><span class="cal">🗓</span><span class="${period ? "" : "ph"}">${period ? esc(period) : "Select schedule date &amp; time range"}</span></button>
+              <div class="period-pop hidden" id="periodPop">
+                <div class="row-2">
+                  <label class="field"><span>Start date &amp; time</span><input type="datetime-local" class="input" id="pStart" value="${sc.start}"></label>
+                  <label class="field"><span>End date &amp; time</span><input type="datetime-local" class="input" id="pEnd" value="${sc.end}"></label>
+                </div>
+                <div class="error hidden" id="pErr" style="margin:-6px 0 10px"></div>
+                <div style="display:flex;justify-content:flex-end;gap:8px"><button class="btn btn-soft btn-sm" id="pClear">Clear</button><button class="btn btn-primary btn-sm" id="pApply">Apply</button></div>
+              </div>
+            </div>
+            ${err.period ? `<div class="error">${err.period}</div>` : ""}</div>
+          <label class="check-inline"><input type="checkbox" id="immediate" ${sc.immediate ? "checked" : ""}> Start Immediately
+            <span class="info" tabindex="0" aria-label="About Start Immediately">i<span class="tip">Starts running as soon as you click Create instead of waiting for the period's start time. A schedule can't be edited once it has started.</span></span></label>
+          <div style="margin-top:16px"><button class="btn-link small" id="backUpload">← Back to upload</button></div>
+        </div>`;
+      bindCommon();
+      const name = $("#schName", box);
+      name.oninput = () => (sc.name = name.value);
+      if (!sc.name) name.focus();
+      $$(".day input", box).forEach((c) => (c.onchange = () => (sc.days = $$(".day input", box).filter((x) => x.checked).map((x) => x.value))));
+      $("#allDays", box).onclick = () => { sc.days = DAYS.slice(); renderSchedule(); };
+      $("#weekdays", box).onclick = () => { sc.days = DAYS.slice(0, 5); renderSchedule(); };
+      $("#changeFile", box).onclick = () => renderUpload();
+      $("#backUpload", box).onclick = () => renderUpload();
+      $("#immediate", box).onchange = (e) => (sc.immediate = e.target.checked);
+      const pop = $("#periodPop", box);
+      $("#periodBtn", box).onclick = () => {
+        pop.classList.toggle("hidden");
+        if (!pop.classList.contains("hidden")) setTimeout(() => pop.scrollIntoView({ block: "nearest", behavior: "smooth" }), 0);
+        if (!sc.start) {
+          const d = new Date(); d.setMinutes(0, 0, 0); d.setHours(d.getHours() + 1);
+          const e2 = new Date(d.getTime() + 7 * 864e5); e2.setHours(18, 0, 0, 0);
+          $("#pStart", box).value = localISO(d); $("#pEnd", box).value = localISO(e2);
+        }
+      };
+      $("#pClear", box).onclick = () => { sc.start = sc.end = ""; renderSchedule(); };
+      $("#pApply", box).onclick = () => {
+        const st = $("#pStart", box).value, en = $("#pEnd", box).value, pe = $("#pErr", box);
+        if (!st || !en) { pe.textContent = "Pick both a start and an end."; pe.classList.remove("hidden"); return; }
+        if (new Date(en) <= new Date(st)) { pe.textContent = "The end must be after the start."; pe.classList.remove("hidden"); return; }
+        sc.start = st; sc.end = en; renderSchedule();
+      };
+      $("#createBtn", box).onclick = () => {
+        const e = {};
+        if (!sc.name.trim()) e.name = "Enter a schedule name.";
+        if (!sc.days.length) e.days = "Pick at least one day.";
+        if (!sc.start || !sc.end) e.period = "Select a date &amp; time range.";
+        if (Object.keys(e).length) return renderSchedule(e);
+        const sched = {
+          id: "sch_" + Math.random().toString(36).slice(2, 8), name: sc.name.trim(), file: t.file.name, count: t.file.rows.length,
+          days: sc.days.slice(), start: sc.start, end: sc.end, immediate: sc.immediate,
+          status: sc.immediate ? "running" : "scheduled", done: 0, createdAt: Date.now(),
+        };
+        a.schedules = a.schedules || [];
+        a.schedules.unshift(sched);
+        created = true;
+        save();
+        renderDone(sched);
+      };
+    }
+
+    function renderDone(sched) {
+      box.innerHTML = `
+        <div class="m-body" style="padding-top:30px">
+          <div class="success">
+            <div class="big">✓</div>
+            <h2 style="font-size:22px">Schedule created</h2>
+            <p class="muted" style="margin:6px 0 18px">${sched.immediate ? `${esc(s.name)} is starting now.` : `${esc(s.name)} will start at the beginning of the period.`}</p>
+          </div>
+          <dl class="kv" style="max-width:520px;margin:0 auto">
+            <dt>Agent</dt><dd>${esc(s.name)}</dd>
+            <dt>Schedule</dt><dd>${esc(sched.name)}</dd>
+            <dt>CSV</dt><dd>${esc(sched.file)} · ${sched.count.toLocaleString()} ${unitFor(s)}</dd>
+            <dt>Days</dt><dd>${esc(daysText(sched.days))}</dd>
+            <dt>Period</dt><dd>${esc(fmtDT(sched.start))} → ${esc(fmtDT(sched.end))}</dd>
+            <dt>Start</dt><dd>${sched.immediate ? "Immediately" : "At period start"}</dd>
+          </dl>
+        </div>
+        <div class="m-foot"><button class="btn btn-ghost" data-x>Done</button><button class="btn btn-primary" id="viewSch">View schedules →</button></div>`;
+      bindCommon();
+      $("#viewSch", box).onclick = () => { onClose = null; close(); go(`#/agent/${a.id}/schedules`); };
+    }
+
+    function bindCommon() { $$("[data-x]", box).forEach((b) => (b.onclick = close)); }
+    renderUpload();
+  }
   // mock analytics, deterministic per agent
   function stats(a) {
     const r = rng(hash(a.id));
@@ -683,7 +981,7 @@
     if (a.status === "deploying") return go("#/deploy/" + a.id);
     const s = a.spec;
     const tabs = [["overview", "Overview"], ["test", s.channel === "voice" ? "Test call" : "Try it"], ["logs", s.channel === "voice" ? "Call logs" : "Conversations"]];
-    if (s.channel === "voice" && s.direction === "outbound") tabs.push(["campaign", "Campaign"]);
+    if (triggerable(a)) tabs.push(["schedules", `Schedules${(a.schedules || []).length ? ` (${a.schedules.length})` : ""}`]);
     tabs.push(["json", "NEO JSON"]);
     if (!tabs.some((t) => t[0] === tab)) tab = "overview";
 
@@ -704,7 +1002,7 @@
     $$("[data-tab]").forEach((b) => (b.onclick = () => go(`#/agent/${a.id}/${b.dataset.tab}`)));
     $("#liveToggle").onchange = (e) => { a.status = e.target.checked ? "live" : "paused"; $("#liveLabel").textContent = e.target.checked ? "Live" : "Paused"; save(); };
 
-    ({ overview: tabOverview, test: tabTest, logs: tabLogs, campaign: tabCampaign, json: tabJson })[tab](a);
+    ({ overview: tabOverview, test: tabTest, logs: tabLogs, schedules: tabSchedules, json: tabJson })[tab](a);
   }
 
   function tabOverview(a) {
@@ -861,78 +1159,54 @@
     bg.onclick = (e) => { if (e.target === bg || e.target.id === "closeM") bg.remove(); };
   }
 
-  function tabCampaign(a) {
+  function tabSchedules(a) {
     const s = a.spec;
-    const c = a.campaign || (a.campaign = { list: null, launched: false });
-    const render = () => {
-      $("#tabBody").innerHTML = `
-        <div class="grid-2">
-          <div class="card card-pad">
-            <div class="section-title">1 · Customer list</div>
-            <div class="dropzone ${c.list ? "ok" : ""}" id="dz">
-              ${c.list ? `<b>✓ ${esc(c.list.name)}</b><div class="small muted">${c.list.count.toLocaleString()} contacts · columns: ${esc(c.list.cols.join(", "))}</div>`
-                : `<div style="font-size:26px">📄</div><b>Upload a CSV</b><div class="small muted">It must include a <code class="mono">customer_phone</code> column.</div>`}
-              <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-                <label class="btn btn-ghost btn-sm">Choose file<input type="file" accept=".csv,text/csv" id="csv" hidden></label>
-                <button class="btn btn-ghost btn-sm" id="sampleList">Use sample list</button>
-                <button class="btn btn-link small" id="dlSample">Download sample CSV</button>
-              </div>
-            </div>
-            <div id="csvErr" class="error"></div>
-            <div class="section-title">2 · Schedule</div>
-            <div class="row-2">
-              <label class="field"><span>Start</span><select class="select"><option>Now</option><option>Tomorrow, 9:00 AM</option></select></label>
-              <label class="field"><span>Call window</span><input class="input" value="${esc((s.callWindow || { from: "09:00" }).from)} – ${esc((s.callWindow || { to: "18:00" }).to)}" readonly></label>
-            </div>
-            <label class="check"><input type="checkbox" checked><div>Retry unanswered calls once after 2 hours</div></label>
-            <div class="actions"><button class="btn btn-primary btn-lg" id="launch" ${c.list && !c.launched ? "" : "disabled"}>${c.launched ? "Campaign running" : "🚀 Launch campaign"}</button></div>
-          </div>
-          <div class="card card-pad">
-            <b>Campaign progress</b>
-            <div class="progress"><i id="cBar" style="width:${c.launched ? c.pct || 0 : 0}%"></i></div>
-            <div class="camp-stats">
-              <div><b id="cDialed">${c.dialed || 0}</b><span>Dialed</span></div>
-              <div><b id="cConn">${c.conn || 0}</b><span>Connected</span></div>
-              <div><b id="cDone">${c.done || 0}</b><span>Completed</span></div>
-              <div><b id="cGoal">${c.goal || 0}</b><span>${esc((s.metrics[0] || { name: "goal" }).name.replace(/_/g, " "))}</span></div>
-            </div>
-            <p class="small muted" style="margin-top:14px">${c.launched ? "Simulated dialing. NEO places each call from the customer_phone column." : "Upload a list and launch to see progress."}</p>
-          </div>
-        </div>`;
+    a.schedules = a.schedules || [];
+    const labels = s.channel === "voice" ? ["Dialed", "Connected", "Completed", (s.metrics[0] || { name: "goal" }).name.replace(/_/g, " ")]
+      : s.channel === "chat" ? ["Sent", "Delivered", "Replied", "Resolved"] : ["Processed", "Succeeded", "Completed", "Needs review"];
+    const nums = (x) => { const d = x.done, c = Math.round(d * 0.78), k = Math.round(c * 0.95); return [d, c, k, Math.round(k * 0.57)]; };
+    const badge = (x) => x.status === "running" ? `<span class="badge badge-ok"><span class="dot pulse"></span> Running</span>` : x.status === "completed" ? `<span class="badge badge-gray">✓ Completed</span>` : `<span class="badge badge-voice">🗓 Scheduled</span>`;
+    const card = (x) => {
+      const pct = Math.round((x.done / x.count) * 100), n = nums(x);
+      return `<div class="card card-pad sch" data-sch="${x.id}">
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start">
+          <div><b class="sch-name">${esc(x.name)}</b> <span class="sch-badge">${badge(x)}</span>
+            <div class="small muted" style="margin-top:4px">📄 ${esc(x.file)} · ${x.count.toLocaleString()} ${unitFor(s)} · ${esc(daysText(x.days))} · ${esc(fmtDT(x.start))} → ${esc(fmtDT(x.end))}${x.immediate ? " · Started immediately" : ""}</div></div>
+          ${x.status === "scheduled" ? `<button class="btn btn-soft btn-sm" data-run="${x.id}" title="Demo only: skip ahead to the start time">▶ Start now (demo)</button>` : ""}
+        </div>
+        ${x.status === "scheduled" ? "" : `<div class="progress"><i style="width:${pct}%"></i></div>
+        <div class="camp-stats" style="margin-top:8px">${labels.map((l, i) => `<div><b data-n="${i}">${n[i].toLocaleString()}</b><span>${esc(l)}</span></div>`).join("")}</div>`}
+      </div>`;
+    };
+    $("#tabBody").innerHTML = `
+      <div class="page-head" style="margin-bottom:14px">
+        <div><h2 style="font-size:20px">Schedules</h2><p class="muted small" style="margin:4px 0 0">Each schedule runs this agent over an uploaded CSV, on the days and dates you choose.</p></div>
+        <button class="btn btn-primary" id="tabTrigger" ${canTrigger(a) ? "" : "disabled"}>⚡ Trigger</button>
+      </div>
+      ${a.schedules.length ? `<div style="display:grid;gap:14px">${a.schedules.map(card).join("")}</div>`
+        : `<div class="card empty"><div class="big">🗓</div><h2 style="font-size:19px;margin:10px 0 6px">No schedules yet</h2><p class="muted">Click <b>Trigger</b> to upload a CSV and schedule this agent.</p></div>`}
+      <p class="small muted" style="margin-top:12px">Progress is simulated for the mockup.</p>`;
+    $("#tabTrigger").onclick = () => openTrigger(a, () => viewAgent(a.id, "schedules"));
+    $$("[data-run]").forEach((b) => (b.onclick = () => { const x = a.schedules.find((y) => y.id === b.dataset.run); x.status = "running"; save(); viewAgent(a.id, "schedules"); }));
 
-      $("#csv").onchange = (e) => {
-        const f = e.target.files[0]; if (!f) return;
-        const rd = new FileReader();
-        rd.onload = () => {
-          const lines = String(rd.result).split(/\r?\n/).filter((l) => l.trim());
-          const cols = (lines[0] || "").split(",").map((x) => x.trim().replace(/^"|"$/g, ""));
-          if (!cols.includes("customer_phone")) { $("#csvErr").textContent = `No "customer_phone" column found. Columns: ${cols.join(", ") || "none"}`; return; }
-          c.list = { name: f.name, count: Math.max(0, lines.length - 1), cols }; save(); render();
-        };
-        rd.readAsText(f);
-      };
-      $("#sampleList").onclick = () => { c.list = { name: "sample-customers.csv", count: 250, cols: ["customer_name", "customer_phone", "last_order_date"] }; save(); render(); };
-      $("#dlSample").onclick = () => download("sample-customers.csv", "customer_name,customer_phone,last_order_date\nJuan Dela Cruz,+639170000001,2026-10-12\nMaria Santos,+639170000002,2026-10-13\nJose Reyes,+639170000003,2026-10-13\n", "text/csv");
-      $("#launch").onclick = () => { c.launched = true; save(); render(); runCampaign(); };
-      if (c.launched && (c.pct || 0) < 100) runCampaign();
+    const running = a.schedules.filter((x) => x.status === "running");
+    if (!running.length) return;
+    const step = () => {
+      let any = false;
+      running.forEach((x) => {
+        if (x.status !== "running") return;
+        x.done = Math.min(x.count, x.done + Math.max(1, Math.ceil(x.count / 40)));
+        if (x.done >= x.count) x.status = "completed"; else any = true;
+        const el = $(`[data-sch="${x.id}"]`);
+        if (!el) return;
+        $(".progress i", el).style.width = Math.round((x.done / x.count) * 100) + "%";
+        nums(x).forEach((v, i) => ($(`[data-n="${i}"]`, el).textContent = v.toLocaleString()));
+        if (x.status === "completed") $(".sch-badge", el).innerHTML = badge(x);
+      });
+      save();
+      if (any) later(step, 250);
     };
-    const runCampaign = () => {
-      const total = c.list.count, r = rng(hash(a.id + "camp"));
-      const step = () => {
-        if (!$("#cBar")) return;
-        c.dialed = Math.min(total, (c.dialed || 0) + Math.ceil(total / 40));
-        c.conn = Math.round(c.dialed * 0.78);
-        c.done = Math.round(c.conn * 0.95);
-        c.goal = Math.round(c.done * (0.55 + r() * 0.05));
-        c.pct = Math.round((c.dialed / total) * 100);
-        $("#cBar").style.width = c.pct + "%";
-        $("#cDialed").textContent = c.dialed; $("#cConn").textContent = c.conn; $("#cDone").textContent = c.done; $("#cGoal").textContent = c.goal;
-        save();
-        if (c.dialed < total) later(step, 250);
-      };
-      later(step, 300);
-    };
-    render();
+    later(step, 300);
   }
 
   function tabJson(a) {
@@ -948,11 +1222,13 @@
     const [path, a, b] = location.hash.replace(/^#\/?/, "").split("/");
     if (!state.user) { if (path !== "login") return go("#/login"); return viewLogin(); }
     if (!state.user.industry && path !== "onboard") return go("#/onboard");
+    seedAgents();
     window.scrollTo(0, 0);
     switch (path) {
       case "login": return go("#/build");
       case "onboard": return viewOnboard();
       case "build": return viewBuild();
+      case "create": return viewCreate();
       case "generate": return viewGenerate();
       case "configure": return viewConfigure();
       case "deploy": return viewDeploy(a);

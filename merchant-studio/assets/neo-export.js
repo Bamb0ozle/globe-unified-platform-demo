@@ -179,7 +179,7 @@ window.GMS_NEO = (function () {
           initial_message: fill(spec.greeting, ctx),
           prompts: pretty({ graph: { nodes, edges }, data }),
           // NEO dials the number stored in this exact variable name.
-          variables: pretty({ stages: [{ name: "customer_phone", vtype: "String" }], initialMessage: [] }),
+          variables: pretty({ stages: voiceVars(spec).map((name) => ({ name, vtype: "String" })), initialMessage: [] }),
         },
         status: "AVAILABLE",
         updated_at: new Date().toISOString(),
@@ -194,6 +194,12 @@ window.GMS_NEO = (function () {
       if (spec.language === "taglish") lines.push("- Reply in the language of the caller's most recent message (Taglish or English).");
       return lines.join("\n");
     }
+  }
+
+  // NEO dials customer_phone, so it is always the first stage variable.
+  function voiceVars(spec) {
+    const f = spec.csvFields || ["customer_phone"];
+    return ["customer_phone", ...f.filter((x) => x !== "customer_phone")];
   }
 
   function genericPrompt(spec, ctx, lang) {
@@ -217,7 +223,7 @@ window.GMS_NEO = (function () {
   // ---------- chat (typebot) ----------
   function chatExport(spec, ctx) {
     const v = (name) => ({ id: "v" + cuid(), name, isSessionVariable: true });
-    const vars = [v("userQuery"), v("customerName"), v("menuChoice")];
+    const vars = [v("userQuery"), v("customerName"), v("menuChoice"), ...(spec.csvFields || []).map(v)];
     const text = (t) => ({ id: cuid(), type: "text", content: { richText: [{ type: "p", children: [{ text: t }] }] } });
 
     const menuBlockId = cuid();

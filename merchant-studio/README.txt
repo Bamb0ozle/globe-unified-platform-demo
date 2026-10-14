@@ -25,13 +25,17 @@ DEMO SCRIPT (about 5 minutes)
    - Personal emails (gmail.com etc.) are rejected; other business domains work
      and you pick the industry yourself.
 2. Confirm the business profile (NeoFoodResto, Food Service).
-3. "What do you want to build today?"
+3. Build page: the merchant's industry templates come first.
    a. Template path: click "Post-order feedback call", tweak it, look at the
       Preview and NEO JSON tabs, then "Deploy to NEO".
-   b. Prompt path: click an example prompt (or type your own), "Generate agent",
-      review what was understood and the generated NEO JSON, then "Import into NEO".
-4. After deploying: place a test call, view call logs, and (outbound voice)
-   upload a customer list and launch a campaign.
+   b. Prompt path: at the bottom, click "Want to build something else? Click here",
+      describe the agent, "Generate agent", review the generated NEO JSON,
+      then "Import into NEO".
+4. My Services: the merchant starts with three live agents. Select one, click
+   "Trigger", upload a CSV (or use the sample list), then "Schedule" to fill in
+   the NEO-style Schedule Details (name, days of week, period, Start Immediately).
+   The required CSV headers are the agent's variables, as in NEO.
+   Open an agent to place a test call, see call logs, and follow its Schedules.
 5. Use the merchant menu (top right) > "Reset demo data" to start over.
 
 
