@@ -1,0 +1,714 @@
+{
+  "retrieved": "2026-10-15",
+  "notes": "Local copies of brand logos and website icons. Raster images are resized within 192 by 192 pixels with their aspect ratio preserved. Cached website icons were downloaded during development; the app makes no external logo requests.",
+  "enterprises": [
+    {
+      "domain": "jollibee.com.ph",
+      "name": "Jollibee",
+      "file": "jollibee.com.ph.png",
+      "page": "https://jollibee.com.ph/",
+      "source": "https://www.jollibee.com.ph/themes/custom/jollibee_theme/favicon.ico"
+    },
+    {
+      "domain": "chowking.com.ph",
+      "name": "Chowking",
+      "file": "chowking.com.ph.png",
+      "page": "https://www.chowking.ph/",
+      "source": "https://www.chowking.ph/wp-content/themes/chowkingtheme/assets/images/favicon/apple-touch-icon.png"
+    },
+    {
+      "domain": "greenwich.com.ph",
+      "name": "Greenwich",
+      "file": "greenwich.com.ph.png",
+      "page": "https://greenwich.com.ph/",
+      "source": "https://order.greenwich.com.ph/favicon/apple-touch-icon.png?version=v1.39.2.1790659983700"
+    },
+    {
+      "domain": "redribbonbakeshop.com.ph",
+      "name": "Red Ribbon",
+      "file": "redribbonbakeshop.com.ph.png",
+      "page": "https://redribbonbakeshop.com.ph/",
+      "source": "https://www.redribbon.ph/favicon/apple-touch-icon.png?version=2.3.0.1790731526143"
+    },
+    {
+      "domain": "manginasal.com",
+      "name": "Mang Inasal",
+      "file": "manginasal.com.png",
+      "page": "https://manginasal.com/",
+      "source": "https://www.manginasal.ph/wp-content/themes/manginasaltheme/favicon.ico"
+    },
+    {
+      "domain": "mcdonalds.com.ph",
+      "name": "McDonald's Philippines",
+      "file": "mcdonalds.com.ph.png",
+      "page": "https://mcdonalds.com.ph/",
+      "source": "https://mcdonalds.com.ph/storage/imageable/4FW1dEBGyIYLixKE7dEOGIIgYLucbLOLfJwMTstM.png"
+    },
+    {
+      "domain": "kfc.com.ph",
+      "name": "KFC Philippines",
+      "file": "kfc.com.ph.png",
+      "page": "https://corporate.kfc.com.ph/",
+      "source": "https://corporate.kfc.com.ph/favicon.ico"
+    },
+    {
+      "domain": "shakeyspizza.ph",
+      "name": "Shakey's Pizza",
+      "file": "shakeyspizza.ph.png",
+      "page": "https://shakeyspizza.ph/",
+      "source": "https://www.google.com/s2/favicons?domain=shakeyspizza.ph&sz=128"
+    },
+    {
+      "domain": "maxschicken.com",
+      "name": "Max's Restaurant",
+      "file": "maxschicken.com.png",
+      "page": "https://maxschicken.com/",
+      "source": "https://maxschicken.com/img/logo_04.png"
+    },
+    {
+      "domain": "goldilocks.com.ph",
+      "name": "Goldilocks",
+      "file": "goldilocks.com.ph.png",
+      "page": "https://goldilocks.com.ph/",
+      "source": "https://www.goldilocks.com.ph/asset/favicon/apple-icon-180x180.png"
+    },
+    {
+      "domain": "armynavy.com.ph",
+      "name": "Army Navy Burger + Burrito",
+      "file": "armynavy.com.ph.png",
+      "page": "https://armynavy.com.ph/",
+      "source": "https://static.wixstatic.com/media/c47332_714ff254f481417a86910a8dbe473ae1%7Emv2.png/v1/fill/w_192%2Ch_192%2Clg_1%2Cusm_0.66_1.00_0.01/c47332_714ff254f481417a86910a8dbe473ae1%7Emv2.png"
+    },
+    {
+      "domain": "yellowcabpizza.com",
+      "name": "Yellow Cab Pizza",
+      "file": "yellowcabpizza.com.png",
+      "page": "https://yellowcabpizza.com/",
+      "source": "https://www.google.com/s2/favicons?domain=yellowcabpizza.com&sz=128"
+    },
+    {
+      "domain": "bonchon.com.ph",
+      "name": "Bonchon Philippines",
+      "file": "bonchon.com.ph.png",
+      "page": "https://bonchon.com.ph/",
+      "source": "https://bonchon.com.ph/favicon/apple-touch-icon.png"
+    },
+    {
+      "domain": "starbucks.ph",
+      "name": "Starbucks Philippines",
+      "file": "starbucks.ph.png",
+      "page": "https://starbucks.ph/",
+      "source": "https://starbuckscard.ph/sbcard/public/icons/touch-icon-iphone4.png"
+    },
+    {
+      "domain": "timhortons.ph",
+      "name": "Tim Hortons Philippines",
+      "file": "timhortons.ph.png",
+      "page": "https://company.timhortons.com/",
+      "source": "https://company.timhortons.com/tim-hortons-red-logo-selector.png"
+    },
+    {
+      "domain": "krispykreme.com.ph",
+      "name": "Krispy Kreme Philippines",
+      "file": "krispykreme.com.ph.png",
+      "page": "https://krispykreme.com.ph/",
+      "source": "https://www.google.com/s2/favicons?domain=krispykreme.com.ph&sz=128"
+    },
+    {
+      "domain": "potatocorner.com",
+      "name": "Potato Corner",
+      "file": "potatocorner.com.png",
+      "page": "https://potatocorner.com/",
+      "source": "https://potatocorner.com/wp-content/uploads/2026/04/pc-logo.png"
+    },
+    {
+      "domain": "gerrysgrill.com",
+      "name": "Gerry's Grill",
+      "file": "gerrysgrill.com.png",
+      "page": "https://gerrysgrill.com/",
+      "source": "https://gerrysgrill.com/images/gerrys-favicon.png"
+    },
+    {
+      "domain": "cabalen.ph",
+      "name": "Cabalen",
+      "file": "cabalen.ph.png",
+      "page": "https://cabalengroup.ph/",
+      "source": "https://cabalengroup.ph/wp-content/uploads/2024/10/cropped-cabalen-group-website-favicon-192x192.png"
+    },
+    {
+      "domain": "pancakehouse.com.ph",
+      "name": "Pancake House",
+      "file": "pancakehouse.com.ph.png",
+      "page": "https://pancakehouse.com.ph/",
+      "source": "https://www.pancakehouse.com.ph/assets/images/favicons/favicon-32x32.png"
+    },
+    {
+      "domain": "tokyotokyo.com.ph",
+      "name": "Tokyo Tokyo",
+      "file": "tokyotokyo.com.ph.png",
+      "page": "https://tokyotokyo.com.ph/",
+      "source": "https://www.google.com/s2/favicons?domain=tokyotokyo.com.ph&sz=128"
+    },
+    {
+      "domain": "angelspizza.com.ph",
+      "name": "Angel's Pizza",
+      "file": "angelspizza.com.ph.png",
+      "page": "https://angelspizza.com.ph/",
+      "source": "https://www.angelspizza.com.ph/favicon-192.png"
+    },
+    {
+      "domain": "dunkin.ph",
+      "name": "Dunkin' Philippines",
+      "file": "dunkin.ph.png",
+      "page": "https://www.dunkin.com.ph/",
+      "source": "https://www.dunkin.com.ph/favicons/favicon-192x192.png"
+    },
+    {
+      "domain": "burgerking.com.ph",
+      "name": "Burger King Philippines",
+      "file": "burgerking.com.ph.png",
+      "page": "https://www.bk.com/",
+      "source": "https://www.bk.com/favicon.ico"
+    },
+    {
+      "domain": "kennyrogers.com.ph",
+      "name": "Kenny Rogers Roasters",
+      "file": "kennyrogers.com.ph.png",
+      "page": "https://www.kennyrogersroasters.com/",
+      "source": "https://www.kennyrogersroasters.com/images/mainnav-logo.png"
+    },
+    {
+      "domain": "smstore.com.ph",
+      "name": "SM Store",
+      "file": "smstore.com.ph.png",
+      "page": "https://www.smstore.com/",
+      "source": "https://smstore.com/wp-content/uploads/2022/06/cropped-favicon-192x192.png"
+    },
+    {
+      "domain": "robinsonsdepartmentstore.com.ph",
+      "name": "Robinsons Department Store",
+      "file": "robinsonsdepartmentstore.com.ph.png",
+      "page": "https://robinsonsdepartmentstore.com.ph/",
+      "source": "https://robinsonsdepartmentstore.com.ph/robinsons-favicon.ico"
+    },
+    {
+      "domain": "puregold.com.ph",
+      "name": "Puregold",
+      "file": "puregold.com.ph.png",
+      "page": "https://puregold.com.ph/",
+      "source": "https://puregold.com.ph/images/headers/pg_logo.png"
+    },
+    {
+      "domain": "nationalbookstore.com",
+      "name": "National Book Store",
+      "file": "nationalbookstore.com.png",
+      "page": "https://nationalbookstore.com/",
+      "source": "https://nationalbookstore.com/cdn/shop/files/nbs-logo_9cb6bf89-4b42-473a-bfa0-473719c6779f.png?height=64&v=1777001464"
+    },
+    {
+      "domain": "acehardware.ph",
+      "name": "Ace Hardware Philippines",
+      "file": "acehardware.ph.png",
+      "page": "https://acehardware.ph/",
+      "source": "https://acehardware.ph/venia-static/icons/apple-touch-icon.png"
+    },
+    {
+      "domain": "watsons.com.ph",
+      "name": "Watsons Philippines",
+      "file": "watsons.com.ph.png",
+      "page": "https://watsons.com.ph/",
+      "source": "https://watsons.com.ph/favicon.ico"
+    },
+    {
+      "domain": "lazada.com.ph",
+      "name": "Lazada Philippines",
+      "file": "lazada.com.ph.png",
+      "page": "https://lazada.com.ph/",
+      "source": "https://www.lazada.com.ph/favicon.ico"
+    },
+    {
+      "domain": "shopee.ph",
+      "name": "Shopee Philippines",
+      "file": "shopee.ph.png",
+      "page": "https://shopee.ph/",
+      "source": "https://deo.shopeemobile.com/shopee/shopee-pcmall-live-sg/assets/icon_favicon_1_96.1ce0e05fc18a86e5.png"
+    },
+    {
+      "domain": "zalora.com.ph",
+      "name": "Zalora Philippines",
+      "file": "zalora.com.ph.png",
+      "page": "https://zalora.com.ph/",
+      "source": "https://zalora.com.ph/favicon.ico"
+    },
+    {
+      "domain": "abenson.com",
+      "name": "Abenson",
+      "file": "abenson.com.png",
+      "page": "https://abenson.com/",
+      "source": "https://www.google.com/s2/favicons?domain=abenson.com&sz=128"
+    },
+    {
+      "domain": "ansons.ph",
+      "name": "Anson's",
+      "file": "ansons.ph.png",
+      "page": "https://ansons.ph/",
+      "source": "https://www.google.com/s2/favicons?domain=ansons.ph&sz=128"
+    },
+    {
+      "domain": "octagon.com.ph",
+      "name": "Octagon Computer Superstore",
+      "file": "octagon.com.ph.png",
+      "page": "https://octagon.com.ph/",
+      "source": "https://www.octagon.com.ph/cdn/shop/files/Octagon_favicon_72facbfe-6a0b-49a4-aa40-f0bf819e23f7_32x32.png?v=1723771810"
+    },
+    {
+      "domain": "bench.com.ph",
+      "name": "Bench",
+      "file": "bench.com.ph.png",
+      "page": "https://shop.bench.com.ph/",
+      "source": "https://shop.bench.com.ph/cdn/shop/files/header-2.png?v=1744380411&width=500"
+    },
+    {
+      "domain": "penshoppe.com",
+      "name": "Penshoppe",
+      "file": "penshoppe.com.png",
+      "page": "https://penshoppe.com/",
+      "source": "https://www.penshoppe.com/cdn/shop/files/P_ICON-favicon_dcbe41e6-c8e7-479a-9a87-f8910669aa07_32x32.png?v=1655957914"
+    },
+    {
+      "domain": "rustans.com",
+      "name": "Rustan's",
+      "file": "rustans.com.png",
+      "page": "https://rustans.com/",
+      "source": "https://rustans.com/cdn/shop/files/Blue_-_435570.png?v=1774945630&width=400"
+    },
+    {
+      "domain": "smmarkets.ph",
+      "name": "SM Supermarket",
+      "file": "smmarkets.ph.png",
+      "page": "https://smmarkets.ph/",
+      "source": "https://smmarkets.ph/venia-static/icons/apple-touch-icon.png"
+    },
+    {
+      "domain": "robinsonssupermarket.com.ph",
+      "name": "Robinsons Supermarket",
+      "file": "robinsonssupermarket.com.ph.png",
+      "page": "https://robinsonssupermarket.com.ph/",
+      "source": "https://www.robinsonssupermarket.com.ph/favicon.ico"
+    },
+    {
+      "domain": "allhome.com.ph",
+      "name": "AllHome",
+      "file": "allhome.com.ph.png",
+      "page": "https://corporate.allhome.com.ph/",
+      "source": "https://corporate.allhome.com.ph/wp-content/uploads/2019/02/logo-1.png"
+    },
+    {
+      "domain": "wilcon.com.ph",
+      "name": "Wilcon Depot",
+      "file": "wilcon.com.ph.png",
+      "page": "https://wilcon.com.ph/",
+      "source": "https://wilcon.com.ph/wp-content/uploads/2021/09/cropped-wilcon-icon-192x192.png"
+    },
+    {
+      "domain": "mrdiy.com.ph",
+      "name": "MR.DIY Philippines",
+      "file": "mrdiy.com.ph.png",
+      "page": "https://www.mrdiy.com/ph/",
+      "source": "https://www.mrdiy.com/ph/public/files/949bb1db0a67f6c68480351628aec7b431918d993cdeb187a7d01f53a9b1a00c.png"
+    },
+    {
+      "domain": "miniso.com.ph",
+      "name": "Miniso Philippines",
+      "file": "miniso.com.ph.png",
+      "page": "https://www.miniso.com/",
+      "source": "https://www.miniso.com/vancheerfile/Images/2024/3/20240309150930294.png"
+    },
+    {
+      "domain": "toykingdom.com.ph",
+      "name": "Toy Kingdom",
+      "file": "toykingdom.com.ph.png",
+      "page": "https://toykingdom.com.ph/",
+      "source": "https://www.toykingdom.com.ph/cdn/shop/t/23/assets/favicon.png?v=50596044788936478891723431000"
+    },
+    {
+      "domain": "metroretail.com.ph",
+      "name": "Metro Retail Stores",
+      "file": "metroretail.com.ph.png",
+      "page": "https://metroretail.com.ph/",
+      "source": "https://www.metroretail.com.ph/images/metro_logo.jpg"
+    },
+    {
+      "domain": "handyman.com.ph",
+      "name": "Handyman Do It Best",
+      "file": "handyman.com.ph.png",
+      "page": "https://handyman.com.ph/",
+      "source": "https://handyman.com.ph/images/favicon.png"
+    },
+    {
+      "domain": "landmark.com.ph",
+      "name": "Landmark",
+      "file": "landmark.com.ph.png",
+      "page": "https://www.landmark.ph/",
+      "source": "https://www.landmark.ph/favicon.ico"
+    },
+    {
+      "domain": "bdo.com.ph",
+      "name": "BDO Unibank",
+      "file": "bdo.com.ph.png",
+      "page": "https://bdo.com.ph/",
+      "source": "https://bdo.com.ph/favicon.ico"
+    },
+    {
+      "domain": "bpi.com.ph",
+      "name": "BPI",
+      "file": "bpi.com.ph.png",
+      "page": "https://bpi.com.ph/",
+      "source": "https://www.bpi.com.ph/content/dam/bpi/main-navigation/BPI_RT__96x42_header_rev.svg"
+    },
+    {
+      "domain": "metrobank.com.ph",
+      "name": "Metrobank",
+      "file": "metrobank.com.ph.png",
+      "page": "https://metrobank.com.ph/",
+      "source": "https://web-assets.metrobank.com.ph/1753963489-mobile_logo_redesign-2025-2x.png"
+    },
+    {
+      "domain": "landbank.com",
+      "name": "Landbank",
+      "file": "landbank.com.png",
+      "page": "https://landbank.com/",
+      "source": "https://landbank.com/favicon.ico"
+    },
+    {
+      "domain": "pnb.com.ph",
+      "name": "PNB",
+      "file": "pnb.com.ph.png",
+      "page": "https://pnb.com.ph/",
+      "source": "https://www.google.com/s2/favicons?domain=pnb.com.ph&sz=128"
+    },
+    {
+      "domain": "securitybank.com",
+      "name": "Security Bank",
+      "file": "securitybank.com.png",
+      "page": "https://securitybank.com/",
+      "source": "https://www.securitybank.com/favicon/apple-touch-icon-152x152.png"
+    },
+    {
+      "domain": "unionbankph.com",
+      "name": "UnionBank",
+      "file": "unionbankph.com.png",
+      "page": "https://unionbankph.com/",
+      "source": "https://www.google.com/s2/favicons?domain=unionbankph.com&sz=128"
+    },
+    {
+      "domain": "rcbc.com",
+      "name": "RCBC",
+      "file": "rcbc.com.png",
+      "page": "https://rcbc.com/",
+      "source": "https://www.rcbc.com/uploads/media/RCBC-Logo-(1x1).png"
+    },
+    {
+      "domain": "chinabank.ph",
+      "name": "China Bank",
+      "file": "chinabank.ph.png",
+      "page": "https://www.chinabank.ph/",
+      "source": "https://www.chinabank.ph/favicon.ico"
+    },
+    {
+      "domain": "eastwestbanker.com",
+      "name": "EastWest Bank",
+      "file": "eastwestbanker.com.png",
+      "page": "https://eastwestbanker.com/",
+      "source": "https://www.eastwestbanker.com/sites/default/files/2025-07/ew-logo.png"
+    },
+    {
+      "domain": "psbank.com.ph",
+      "name": "PSBank",
+      "file": "psbank.com.ph.png",
+      "page": "https://psbank.com.ph/",
+      "source": "https://www.psbank.com.ph/media/1065/psbank-logo.png"
+    },
+    {
+      "domain": "aub.com.ph",
+      "name": "AUB (Asia United Bank)",
+      "file": "aub.com.ph.png",
+      "page": "https://aub.com.ph/",
+      "source": "https://www.aub.com.ph/resources/images/assets/AUB-Logo.gif"
+    },
+    {
+      "domain": "maybank.com.ph",
+      "name": "Maybank Philippines",
+      "file": "maybank.com.ph.png",
+      "page": "https://maybank.com.ph/",
+      "source": "https://maybank.com.ph/favicon.ico"
+    },
+    {
+      "domain": "robinsonsbank.com.ph",
+      "name": "Robinsons Bank",
+      "file": "robinsonsbank.com.ph.png",
+      "page": "https://www.jgsummit.com.ph/annualreport2020/where-to-play/",
+      "source": "https://www.jgsummit.com.ph/annualreport2020/wp-content/uploads/RBank_DeepSeaGreen-768x115.png",
+      "note": "Archived Robinsons Bank mark, retained for this directory entry."
+    },
+    {
+      "domain": "gotyme.com.ph",
+      "name": "GoTyme Bank",
+      "file": "gotyme.com.ph.png",
+      "page": "https://gotyme.com.ph/",
+      "source": "https://www.gotyme.com.ph/static-assets/images/favicon.ico"
+    },
+    {
+      "domain": "maya.ph",
+      "name": "Maya Bank",
+      "file": "maya.ph.png",
+      "page": "https://maya.ph/",
+      "source": "https://www.maya.ph/hubfs/Maya/money-green.svg"
+    },
+    {
+      "domain": "tonikbank.com",
+      "name": "Tonik Digital Bank",
+      "file": "tonikbank.com.png",
+      "page": "https://tonikbank.com/",
+      "source": "https://tonikbank.com/sites/default/files/favicon_0.ico"
+    },
+    {
+      "domain": "cimbbank.com.ph",
+      "name": "CIMB Bank Philippines",
+      "file": "cimbbank.com.ph.png",
+      "page": "https://cimbbank.com.ph/",
+      "source": "https://www.cimbbank.com.ph/content/dam/cimb/favicon/apple-touch-icon-152x152.png"
+    },
+    {
+      "domain": "homecredit.ph",
+      "name": "Home Credit Philippines",
+      "file": "homecredit.ph.png",
+      "page": "https://homecredit.ph/",
+      "source": "https://www.google.com/s2/favicons?domain=homecredit.ph&sz=128"
+    },
+    {
+      "domain": "billease.ph",
+      "name": "BillEase",
+      "file": "billease.ph.png",
+      "page": "https://billease.ph/",
+      "source": "https://billease.ph/img/favicon/billie-peek-apple-touch-180.png"
+    },
+    {
+      "domain": "cebuanalhuillier.com",
+      "name": "Cebuana Lhuillier",
+      "file": "cebuanalhuillier.com.png",
+      "page": "https://cebuanalhuillier.com/",
+      "source": "https://cebuanalhuillier.com/wp-content/uploads/2023/09/cl-logo.png"
+    },
+    {
+      "domain": "palawanpawnshop.com",
+      "name": "Palawan Pawnshop",
+      "file": "palawanpawnshop.com.png",
+      "page": "https://palawanpawnshop.com/",
+      "source": "https://www.palawanpawnshop.com/assets/main/images/favicon.png"
+    },
+    {
+      "domain": "mlhuillier.com",
+      "name": "M Lhuillier",
+      "file": "mlhuillier.com.png",
+      "page": "https://mlhuillier.com/",
+      "source": "https://mlhuillier.com/favicon.ico?favicon.1748e1-e7h4de.ico"
+    },
+    {
+      "domain": "bankcom.com.ph",
+      "name": "Bank of Commerce",
+      "file": "bankcom.com.ph.png",
+      "page": "https://www.bankcom.com.ph/",
+      "source": "https://www.bankcom.com.ph/wp-content/themes/bankofcommerce/images/favicon.ico"
+    },
+    {
+      "domain": "dbp.ph",
+      "name": "DBP (Development Bank of the Philippines)",
+      "file": "dbp.ph.png",
+      "page": "https://www.dbp.ph/",
+      "source": "https://www.dbp.ph/favicon.ico"
+    },
+    {
+      "domain": "stluke.com.ph",
+      "name": "St. Luke's Medical Center",
+      "file": "stluke.com.ph.png",
+      "page": "https://stluke.com.ph/",
+      "source": "https://www.stlukes.com.ph/favicon.ico"
+    },
+    {
+      "domain": "themedicalcity.com",
+      "name": "The Medical City",
+      "file": "themedicalcity.com.png",
+      "page": "https://themedicalcity.com/",
+      "source": "https://www.themedicalcity.com/themes/tmc/assets/images/favicon.ico"
+    },
+    {
+      "domain": "makatimed.net.ph",
+      "name": "Makati Medical Center",
+      "file": "makatimed.net.ph.png",
+      "page": "https://makatimed.net.ph/",
+      "source": "https://www.makatimed.net.ph/wp-content/uploads/2021/02/BsyZoo-z_400x400-300x300.png"
+    },
+    {
+      "domain": "asianhospital.com",
+      "name": "Asian Hospital and Medical Center",
+      "file": "asianhospital.com.png",
+      "page": "https://asianhospital.com/",
+      "source": "https://www.asianhospital.com/images/favicon.png"
+    },
+    {
+      "domain": "cardinalsantos.com.ph",
+      "name": "Cardinal Santos Medical Center",
+      "file": "cardinalsantos.com.ph.png",
+      "page": "https://cardinalsantos.com.ph/",
+      "source": "https://cardinalsantos.com.ph/wp-content/uploads/2022/10/CSMC-Logo-Red.png"
+    },
+    {
+      "domain": "maniladoctors.com.ph",
+      "name": "Manila Doctors Hospital",
+      "file": "maniladoctors.com.ph.png",
+      "page": "https://www.maniladoctors.com.ph/",
+      "source": "https://maniladoctors.sgp1.digitaloceanspaces.com/cms_images/NH9RUyU2IB0PfzcgyFz3RAQwgNaNiq5GuNEceESd.png"
+    },
+    {
+      "domain": "chonghua.com.ph",
+      "name": "Chong Hua Hospital",
+      "file": "chonghua.com.ph.png",
+      "page": "https://chonghua.com.ph/",
+      "source": "https://chonghua.com.ph/wp-content/uploads/2024/12/cropped-logo-icon-192x192.png"
+    },
+    {
+      "domain": "ddh.com.ph",
+      "name": "Davao Doctors Hospital",
+      "file": "ddh.com.ph.png",
+      "page": "https://ddh.com.ph/",
+      "source": "https://ddh.com.ph/wp-content/uploads/2023/05/cropped-favicon-192x192.png"
+    },
+    {
+      "domain": "capitolmedical.com.ph",
+      "name": "Capitol Medical Center",
+      "file": "capitolmedical.com.ph.png",
+      "page": "https://capitolmedical.com.ph/",
+      "source": "https://capitolmedical.com.ph/wp-content/uploads/2022/08/favicon-32x32-1.png"
+    },
+    {
+      "domain": "cghmc.com.ph",
+      "name": "Chinese General Hospital",
+      "file": "cghmc.com.ph.png",
+      "page": "https://cghmc.com.ph/",
+      "source": "https://cghmc.com.ph/wp-content/uploads/2022/10/cropped-favicon-192x192.png"
+    },
+    {
+      "domain": "qualimed.com.ph",
+      "name": "QualiMed",
+      "file": "qualimed.com.ph.png",
+      "page": "https://www.healthwaymedicalnetwork.com.ph/our-network/healthway-qualimed-hospital-iloilo/",
+      "source": "https://www.google.com/s2/favicons?domain=healthway.com.ph&sz=128",
+      "note": "Healthway Medical Network brand used for Healthway QualiMed."
+    },
+    {
+      "domain": "healthway.com.ph",
+      "name": "Healthway Medical",
+      "file": "healthway.com.ph.png",
+      "page": "https://healthway.com.ph/",
+      "source": "https://www.google.com/s2/favicons?domain=healthway.com.ph&sz=128"
+    },
+    {
+      "domain": "hi-precision.com.ph",
+      "name": "Hi-Precision Diagnostics",
+      "file": "hi-precision.com.ph.png",
+      "page": "https://hi-precision.com.ph/",
+      "source": "https://hi-precision.com.ph/favicon.ico"
+    },
+    {
+      "domain": "mercurydrug.com",
+      "name": "Mercury Drug",
+      "file": "mercurydrug.com.png",
+      "page": "https://mercurydrug.com/",
+      "source": "https://www.mercurydrug.com/public/images/md-main-logo.png"
+    },
+    {
+      "domain": "rosepharmacy.com",
+      "name": "Rose Pharmacy",
+      "file": "rosepharmacy.com.png",
+      "page": "https://rosepharmacy.com/",
+      "source": "https://www.rosepharmacy.com/ph1/wp-content/uploads/2023/03/favicon-1.ico"
+    },
+    {
+      "domain": "southstardrug.com.ph",
+      "name": "Southstar Drug",
+      "file": "southstardrug.com.ph.png",
+      "page": "https://southstardrug.com.ph/",
+      "source": "https://southstardrug.com.ph/cdn/shop/files/ssd_icon_8e58cfcf-ed74-4275-8e26-9c08dc7bba98.png?crop=center&height=32&v=1623392065&width=32"
+    },
+    {
+      "domain": "tgp.com.ph",
+      "name": "The Generics Pharmacy",
+      "file": "tgp.com.ph.png",
+      "page": "https://tgp.com.ph/",
+      "source": "https://tgp.com.ph/wp-content/uploads/2025/10/images.png"
+    },
+    {
+      "domain": "generika.com.ph",
+      "name": "Generika Drugstore",
+      "file": "generika.com.ph.png",
+      "page": "https://generika.com.ph/",
+      "source": "https://www.generika.com.ph/wp-content/uploads/2023/10/GENERIKAICON1.ico"
+    },
+    {
+      "domain": "medicardphils.com",
+      "name": "Medicard Philippines",
+      "file": "medicardphils.com.png",
+      "page": "https://www.medicardphils.com/",
+      "source": "https://www.medicardphils.com/wp-content/uploads/2023/07/MediCard-Favicon.png"
+    },
+    {
+      "domain": "maxicare.com.ph",
+      "name": "Maxicare",
+      "file": "maxicare.com.ph.png",
+      "page": "https://www.maxicare.com.ph/",
+      "source": "https://www.maxicare.com.ph/wp-content/uploads/2022/08/fav.png"
+    },
+    {
+      "domain": "intellicare.net.ph",
+      "name": "Intellicare",
+      "file": "intellicare.net.ph.png",
+      "page": "https://intellicare.net.ph/",
+      "source": "https://www.intellicare.com.ph/images/intellicarelogo.png"
+    },
+    {
+      "domain": "philcare.com.ph",
+      "name": "PhilCare",
+      "file": "philcare.com.ph.png",
+      "page": "https://philcare.com.ph/",
+      "source": "https://philcare.com.ph/assets/imgs/philcare-logo.png"
+    },
+    {
+      "domain": "belomed.com",
+      "name": "Belo Medical Group",
+      "file": "belomed.com.png",
+      "page": "https://belomed.com/",
+      "source": "https://belomed.com/wp-content/uploads/2024/09/belo-medical-group-logo.webp"
+    },
+    {
+      "domain": "unilab.com.ph",
+      "name": "Unilab",
+      "file": "unilab.com.ph.png",
+      "page": "https://unilab.com.ph/",
+      "source": "https://unilab.com.ph/favicon.ico"
+    },
+    {
+      "domain": "aventusmedical.com.ph",
+      "name": "Aventus Medical Care",
+      "file": "aventusmedical.com.ph.png",
+      "page": "https://www.aventusmedical.com.ph/",
+      "source": "https://www.aventusmedical.com/images/aventus_icon.png"
+    },
+    {
+      "domain": "neofoodresto.com.ph",
+      "name": "NeoFoodResto",
+      "file": "neofoodresto.svg",
+      "source": "Created in this repository for the fictional demo enterprise."
+    }
+  ]
+}
