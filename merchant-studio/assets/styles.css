@@ -295,6 +295,13 @@ label.field.has-error > span { color: var(--danger); }
 .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
 
 /* transcript */
+.kyc-audio { padding: 18px; border-bottom: 1px solid var(--line); }
+.kyc-audio-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.kyc-audio-head b { color: var(--globe-navy); }
+.kyc-audio p { margin: 10px 0; }
+.kyc-audio audio { display: block; width: 100%; margin-top: 12px; }
+.kyc-transcript .msg { transition: box-shadow 0.15s; }
+.kyc-transcript .msg.speaking { box-shadow: 0 0 0 2px var(--action); }
 .transcript { display: grid; gap: 10px; padding: 18px; max-height: 520px; overflow: auto; }
 .msg { max-width: 84%; padding: 10px 14px; border-radius: 16px; font-size: 14px; animation: slidein 0.25s ease-out; }
 .msg .who { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; margin-bottom: 2px; }

@@ -24,6 +24,8 @@ Use **EN (English)** or **tl (Tagalog)** on the entry gate, sign-in screens, or 
 3. **My Services:** the enterprise starts with three live agents. Double-click one to open it, or select one and click **Trigger** to upload a CSV, then fill in NEO-style **Schedule Details** (name, days of week, period, Start Immediately). The required CSV headers are the agent's variables, mirroring NEO.
 4. **Each agent** has a test call or chat, call logs, schedules with simulated progress, and the generated JSON. Agents are **editable**: Save & republish creates a new version, and older versions can be restored. Running schedules keep the version they started with.
 
+The **KYC document reminder** now checks document readiness before upload guidance. Its **Preview** and **Test call** screens include fixed English and Tagalog recordings with distinct AI and customer voices. Use the recording's **EN (English)** / **tl (Tagalog)** buttons to choose audio independently of the interface language. The transcript highlights the current speaker. The recordings use Joy and a sample bank; editing an agent does not regenerate them. Both MP3 files are bundled and play offline.
+
 ## Repository layout
 
 | Path | What it is |
@@ -32,10 +34,21 @@ Use **EN (English)** or **tl (Tagalog)** on the entry gate, sign-in screens, or 
 | `merchant-studio/assets/entry-gate.js` | Password gate that loads the app after verification |
 | `merchant-studio/assets/i18n.js` | Language switching and dynamic interface translation |
 | `merchant-studio/assets/i18n-tl.js` | Tagalog interface copy and all 40 translated templates |
+| `merchant-studio/assets/kyc-player.js` | KYC recording controls and transcript synchronization |
+| `merchant-studio/assets/kyc-audio.js` | Fixed KYC recording transcripts and timestamps |
+| `merchant-studio/assets/audio/` | English and Tagalog KYC MP3 recordings |
 | `merchant-studio/assets/neo-export.js` | Builds NEO voice / chat / flow import JSON |
 | `merchant-studio/assets/data.js` | Industries, templates, demo enterprise detection |
 | `neo-export-samples/` | Redacted real NEO exports used as the reference for the JSON structure |
 | `package.ps1` | Zips `merchant-studio/` into `dist/` for sharing |
+
+The launchers use `server.js` when Node.js is available, with `server.py` as the Python fallback. Both support audio byte-range requests for Safari playback and seeking. Opening `index.html` directly still works.
+
+## Development checks and audio generation
+
+Run `node --test merchant-studio/tests/kyc.test.cjs merchant-studio/tests/audio-server.test.cjs` to check KYC content, playback controls, and both local servers. The server checks require Node.js and Python 3.
+
+The bundled recordings were generated with [edge-tts](https://github.com/rany2/edge-tts) and ffmpeg. They use the [Microsoft voices](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support) `en-PH-RosaNeural`, `en-PH-JamesNeural`, `fil-PH-BlessicaNeural`, and `fil-PH-AngeloNeural`. To regenerate them, install `edge-tts` in a development environment, make Node.js and ffmpeg available, then run `python3 merchant-studio/tools/generate-kyc-audio.py`. Generation requires internet access and sends only the scripted sample text. The app has no runtime speech-service dependency.
 
 ## Notes
 

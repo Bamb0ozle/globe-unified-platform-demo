@@ -1,7 +1,7 @@
 GLOBE AI STUDIO - CLICKABLE MOCKUP
 ==================================
 
-A concept mockup of a enterprise self-service platform: Globe enterprises sign in
+A concept mockup of an enterprise self-service platform: Globe enterprises sign in
 and build AI voice / chat / flow agents, powered by NEO in the background.
 
 Everything is simulated in your browser. No real email, NEO, or telephony
@@ -31,6 +31,18 @@ The language choice is saved for the next visit. Switching preserves form entrie
 All 40 templates, default form content, and sample conversations have Tagalog copy.
 CSV headers, user content, and NEO JSON keep their original values.
 The agent setup section is named "Agent Information".
+
+KYC DEMO AUDIO
+The KYC document reminder checks document readiness before upload guidance.
+Choose Banking & Lending in Profile, then open the KYC template from Build.
+The Preview and Test call screens include fixed English and Tagalog recordings.
+Use the recording's EN (English) / tl (Tagalog) buttons to choose its language.
+The transcript highlights the speaker during playback.
+The green test-call button also plays or stops the selected recording.
+These fixed samples use Joy and a sample bank. Agent edits do not change them.
+Both recordings are included with the app and play offline.
+The launchers use Node.js first, then the included Python fallback server.
+Both servers support Safari audio loading and seeking.
 
 1. Start screen: choose "Existing Enterprise" or "Register Now".
    - Existing Enterprise: sign in with  ops@neofoodresto.com.ph  (pre-registered

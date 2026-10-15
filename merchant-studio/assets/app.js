@@ -5,6 +5,7 @@
   const D = window.GMS_DATA;
   const NEO = window.GMS_NEO;
   const I18N = window.GMS_I18N;
+  const KYC = window.GMS_KYC_PLAYER;
   I18N.registerData(D);
   const app = document.getElementById("app");
   const STORE_KEY = "gms-state-v1";
@@ -777,9 +778,11 @@
       $("#stages").innerHTML = spec.stages.map((s, i) => `<div class="stage"><span class="num">${i + 1}</span><input class="input" data-i18n-value data-si="${i}" value="${esc(s)}"><button class="icon-btn" data-del="${i}" title="Remove step">✕</button></div>`).join("");
     };
     const renderPane = () => {
+      KYC.stop();
       if (tab === "preview") {
-        $("#pane").innerHTML = `<div class="transcript">${transcriptFor(spec).map(([who, text]) => msgHtml(who, fill(text, spec), spec)).join("")}</div>
+        $("#pane").innerHTML = `${KYC.matches(spec) ? KYC.markup() : `<div class="transcript">${transcriptFor(spec).map(([who, text]) => msgHtml(who, fill(text, spec), spec)).join("")}</div>`}
           <div class="summary-box small muted">Sample ${spec.channel === "voice" ? "call" : "conversation"}. Your agent will adapt to what the customer actually says.</div>`;
+        if (KYC.matches(spec)) KYC.mount($("#pane"));
       } else {
         const exp = NEO.build(activeSpec(spec), ctxFor(spec));
         $("#pane").innerHTML = jsonCard(exp, "Updates as you edit.").replace('<div class="card">', "<div>");
@@ -1428,6 +1431,7 @@
 
   function tabTest(a) {
     const s = a.spec;
+    const kyc = KYC.matches(s);
     const lines = transcriptFor(s).map(([w, t]) => [w, fill(t, s)]);
     if (s.channel === "voice") {
       $("#tabBody").innerHTML = `
@@ -1443,10 +1447,26 @@
           </div></div>
           <div class="card">
             <div class="json-head"><b style="font-size:14px">Live transcript</b><span class="small muted">Simulated call</span></div>
-            <div class="transcript" id="tr"><p class="muted small" style="margin:0">Press the green button to start a test call.</p></div>
+            ${kyc ? KYC.markup() : `<div class="transcript" id="tr"><p class="muted small" style="margin:0">Press the green button to start a test call.</p></div>`}
             <div class="summary-box hidden" id="sumBox"></div>
           </div>
         </div>`;
+      if (kyc) {
+        const player = KYC.mount($("#tabBody"), {
+          onState(value) {
+            const playing = value === "playing" || value === "loading";
+            $("#callBtn").className = "call-btn " + (playing ? "end" : "go");
+            $("#callBtn").title = playing ? "End call" : "Start call";
+            $("#pStatus").textContent = ({ playing: "Connected", loading: "Loading audio…", paused: "Playback paused", ended: "Call ended", stopped: "Call ended by you", error: "Audio unavailable. Reload the page to try again." })[value] || (s.direction === "inbound" ? "Call your AI hotline" : "Have the agent call you");
+            if (value === "ended" || value === "stopped") showSummary(s, $("#sumBox"));
+            else if (value === "playing" || value === "idle") $("#sumBox").classList.add("hidden");
+          },
+          onTime(seconds) { $("#pTimer").textContent = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`; },
+          onSpeaker(who) { $("#pWave").classList.toggle("on", who === "agent"); },
+        });
+        $("#callBtn").onclick = () => player.playing ? player.stop() : player.play();
+        return;
+      }
       let running = false, tick = null;
       $("#callBtn").onclick = () => {
         if (running) return endCall();
@@ -1512,6 +1532,7 @@
     const r = rng(hash(s.name));
     box.innerHTML = `<b class="small">Post-${s.channel === "voice" ? "call" : "conversation"} summary (extracted by NEO)</b>
       <dl class="kv small" style="margin-top:8px;grid-template-columns:200px 1fr">${s.metrics.map((m) => `<dt class="mono">${esc(m.name)}</dt><dd>${esc(summaryValue(s, m, r))}</dd>`).join("")}</dl>`;
+    box.classList.remove("hidden");
   }
 
   // values consistent with the scripted (happy-path) transcript
@@ -1520,7 +1541,6 @@
     if (m.type === "boolean") return /cancel|opted_out|hardship|escalat|human|transfer|changes|missing/.test(m.name) ? "False" : "True";
     if (m.type === "number") return { nps: "9", party_size: "4" }[m.name] || "5";
     return metricSample(m, r);
-    box.classList.remove("hidden");
   }
 
   function tabLogs(a) {
@@ -1612,6 +1632,7 @@
   // ---------- router ----------
   function route() {
     clearTimers();
+    KYC.stop();
     $$(".modal-bg").forEach((m) => m.remove());
     const [path, a, b] = location.hash.replace(/^#\/?/, "").split("/");
     if (!state.user) {

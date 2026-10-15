@@ -2,7 +2,7 @@
    Static hosting needs server-side authentication to protect the source files. */
 (function () {
   const PASSWORD_SHA256 = "10819d2628a6b73833db64d9e7cf8b2bf437c61d35c913a4d1412e46254daf2e";
-  const scripts = ["assets/data.js", "assets/neo-export.js", "assets/app.js"];
+  const scripts = ["assets/data.js", "assets/neo-export.js", "assets/kyc-audio.js", "assets/kyc-player.js", "assets/app.js"];
   const loaded = new Set();
   const form = document.getElementById("entry-form");
   const password = document.getElementById("entry-password");
