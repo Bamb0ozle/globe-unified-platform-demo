@@ -4,6 +4,8 @@
 (function () {
   const D = window.GMS_DATA;
   const NEO = window.GMS_NEO;
+  const I18N = window.GMS_I18N;
+  I18N.registerData(D);
   const app = document.getElementById("app");
   const STORE_KEY = "gms-state-v1";
 
@@ -88,6 +90,7 @@
           <a href="#/services" class="${active === "services" ? "active" : ""}">My Services${myAgents().length ? `<span class="count">${myAgents().length}</span>` : ""}</a>
         </nav>
         <div class="topbar-right">
+          <div data-language-switch></div>
           <div class="merchant-chip" id="chip">
             <div class="avatar">${esc(initials)}</div>
             <div class="who"><b>${esc(u.merchant)}</b><span class="muted">${esc(industry(u.industry).name)}</span></div>
@@ -113,7 +116,7 @@
     menu.addEventListener("click", (e) => {
       const act = e.target.dataset.act;
       if (act === "logout") { state.user = null; state.draft = null; save(); go("#/welcome"); }
-      if (act === "reset") { if (confirm("Remove all demo data (services and registrations) and sign out?")) { state = { user: null, agents: [], draft: null }; save(); go("#/welcome"); } }
+      if (act === "reset") { if (confirm(I18N.t("Remove all demo data (services and registrations) and sign out?"))) { state = { user: null, agents: [], draft: null }; save(); go("#/welcome"); } }
       if (act === "profile") go("#/profile");
     });
   }
@@ -134,13 +137,13 @@
           <p class="lead">Pick a ready-made template for your industry, or describe what you need. Your agent runs on Globe's network.<br>Powered by NEO.</p>
           <div class="auth-points">
             <div class="auth-point"><span class="ic">📞</span><div><b>Voice-first.</b> Outbound campaigns and inbound hotlines on Globe telephony.</div></div>
-            <div class="auth-point"><span class="ic">🧩</span><div><b>Templates for your industry.</b> Top use cases, ready to customize.</div></div>
+            <div class="auth-point"><span class="ic">🧩</span><div><b>Templates for your industry.</b> Top Agents, ready to customize.</div></div>
             <div class="auth-point"><span class="ic">✨</span><div><b>Describe it, we build it.</b> Turn a prompt into a working agent.</div></div>
           </div>
           <div class="wave">${waveBars(48)}</div>
           <div class="powered credits">Powered by <img class="cr-neo" src="assets/neo-logo.svg" alt="NEO"><i class="cr-sep"></i><img class="cr-obz-full" src="assets/obz-full-white.svg" alt="OneByZero"></div>
         </section>
-        <section class="auth-form"><div class="auth-box" id="authbox"></div></section>
+        <section class="auth-form"><div class="auth-language" data-language-switch></div><div class="auth-box" id="authbox"></div></section>
       </div>`;
     return $("#authbox");
   }
@@ -154,7 +157,7 @@
       <div class="choice-list">
         <a class="choice" href="#/login">
           <span class="choice-ic">🏪</span>
-          <span><b>Existing Merchant</b><span class="muted">Sign in with your registered work email.</span></span>
+          <span><b>Existing Enterprise</b><span class="muted">Sign in with your registered work email.</span></span>
           <span class="choice-go">→</span>
         </a>
         <a class="choice choice-primary" href="#/register">
@@ -163,7 +166,7 @@
           <span class="choice-go">→</span>
         </a>
       </div>
-      <p class="auth-foot">Globe Business merchants only.</p>`;
+      <p class="auth-foot">Globe Business enterprises only.</p>`;
   }
 
   function viewLogin() {
@@ -222,11 +225,11 @@
       box.innerHTML = `
         <a class="back-link" href="#/welcome">← Back</a>
         <h2>Register your business</h2>
-        <p class="sub">Find your business in the Globe merchant directory, then verify your work email.</p>
-        <ol class="reg-steps"><li class="${m ? "done" : "on"}">Merchant</li><li class="${m && !taken ? "on" : ""}">Work email</li><li>Verify</li></ol>
+        <p class="sub">Find your business in the Globe enterprise directory, then verify your work email.</p>
+        <ol class="reg-steps"><li class="${m ? "done" : "on"}">Enterprise</li><li class="${m && !taken ? "on" : ""}">Work email</li><li>Verify</li></ol>
 
         <div class="reg-row">
-          <label class="reg-label" for="mSearch">Merchant Name <i>*</i></label>
+          <label class="reg-label" for="mSearch">Enterprise Name <i>*</i></label>
           ${m ? `
             <div class="merchant-pick">
               <span class="mp-ic">${industry(m.industry).icon}</span>
@@ -278,7 +281,7 @@
         if (!input.value.trim()) { list.classList.add("hidden"); input.setAttribute("aria-expanded", "false"); return; }
         list.innerHTML = results.length
           ? results.map((r, i) => `<button type="button" class="sg ${i === 0 ? "on" : ""}" role="option" data-i="${i}"><span class="sg-ic">${industry(r.industry).icon}</span><span class="sg-txt"><b>${hl(r.name, input.value)}</b><span>${esc(industry(r.industry).name)} · ${esc(r.domain)}</span></span></button>`).join("")
-          : `<div class="sg-empty">No merchant matches “${esc(input.value.trim())}”. Try <b>Jollibee</b>, <b>BDO</b> or <b>Mercury Drug</b>.</div>`;
+          : `<div class="sg-empty">No enterprise matches “${esc(input.value.trim())}”. Try <b>Jollibee</b>, <b>BDO</b> or <b>Mercury Drug</b>.</div>`;
         list.classList.remove("hidden");
         input.setAttribute("aria-expanded", "true");
         $$(".sg", list).forEach((b) => (b.onmousedown = (e) => { e.preventDefault(); pick(results[+b.dataset.i]); }));
@@ -319,8 +322,8 @@
       const steps = [
         ["Checking the email address", email],
         [`Looking up mail records for ${m.domain}`, "MX records found (simulated)"],
-        ["Matching the domain to the Globe merchant directory", `${m.name} · ${industry(m.industry).name}`],
-        ["Creating your merchant account", "Registered"],
+        ["Matching the domain to the Globe enterprise directory", `${m.name} · ${industry(m.industry).name}`],
+        ["Creating your enterprise account", "Registered"],
       ];
       box.innerHTML = `
         <div class="verifying">
@@ -442,7 +445,7 @@
     if (!showAll) {
       body = `
         <div class="page-head">
-          <div><h1>${mine.icon} Top use cases for ${esc(mine.name)}</h1>
+          <div><h1>${mine.icon} Top Agents for ${esc(mine.name)}</h1>
           <p class="muted" style="margin:6px 0 0">Ready-made agents for ${esc(u.merchant)}. Pick one, adjust it, and deploy to NEO.</p></div>
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${chSeg}<a class="btn btn-ghost btn-sm" href="#/build/all">See all templates →</a></div>
         </div>
@@ -451,7 +454,7 @@
       const inds = homeFilter.industry ? live.filter((i) => i.id === homeFilter.industry) : [mine, ...live.filter((i) => i.id !== mine.id)];
       const total = live.reduce((n, i) => n + D.templates[i.id].length, 0);
       body = `
-        <div class="crumbs"><a href="#/build">Top use cases for ${esc(mine.name)}</a> › All templates</div>
+        <div class="crumbs"><a href="#/build">Top Agents for ${esc(mine.name)}</a> › All templates</div>
         <div class="page-head">
           <div><h1>All templates</h1><p class="muted" style="margin:6px 0 0">${total} ready-made agents across every industry. Use any of them, whatever your industry.</p></div>
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${chSeg}</div>
@@ -461,7 +464,7 @@
           ${live.map((i) => `<button data-i="${i.id}" class="${homeFilter.industry === i.id ? "on" : ""}">${i.icon} ${esc(i.name)}${i.id === u.industry ? " (yours)" : ""}</button>`).join("")}
         </div>
         ${inds.map((i) => `<h2 class="ind-head">${i.icon} ${esc(i.name)}${i.id === u.industry ? ` <span class="badge badge-voice">Your industry</span>` : ""}</h2><div class="tpl-grid" style="margin-bottom:30px">${templateCards(i.id)}</div>`).join("")}
-        <div style="text-align:center"><a class="btn btn-ghost" href="#/build">← Back to top use cases for ${esc(mine.name)}</a></div>`;
+        <div style="text-align:center"><a class="btn btn-ghost" href="#/build">← Back to top Agents for ${esc(mine.name)}</a></div>`;
     }
     app.innerHTML = shell("build", `
       <div class="page">
@@ -499,13 +502,13 @@
         <div class="card card-pad" style="margin-bottom:18px">
           <div class="section-title">Business</div>
           <dl class="kv">
-            <dt>Merchant</dt><dd>${esc(u.merchant)}</dd>
+            <dt>Enterprise</dt><dd>${esc(u.merchant)}</dd>
             <dt>Industry</dt><dd>${industry(u.industry).icon} ${esc(industry(u.industry).name)}</dd>
             <dt>Agents</dt><dd>${myAgents().length}</dd>
           </dl>
           <details class="subtle" id="indDetails">
             <summary>Industry looks wrong?</summary>
-            <p class="small muted" style="margin:10px 0">Your industry decides which top use cases you see first. Your existing agents won't change.</p>
+            <p class="small muted" style="margin:10px 0">Your industry decides which top Agents you see first. Your existing agents won't change.</p>
             <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
               <select class="select" id="indPick" style="width:auto">
                 ${D.industries.map((i) => `<option value="${i.id}" ${i.id === u.industry ? "selected" : ""} ${i.live ? "" : "disabled"}>${i.name}${i.live ? "" : " (coming soon)"}</option>`).join("")}
@@ -531,7 +534,7 @@
       save();
       viewProfile();
       $("#indDetails").open = true;
-      $("#indMsg").innerHTML = `<span style="color:var(--ok);font-weight:700">✓ Saved. <a href="#/build">See your top use cases →</a></span>`;
+      $("#indMsg").innerHTML = `<span style="color:var(--ok);font-weight:700">✓ Saved. <a href="#/build">See your top Agents →</a></span>`;
     };
   }
 
@@ -549,7 +552,7 @@
           <h1>What do you want to build today?</h1>
           <p class="sub">Describe it in plain words and we'll generate a NEO agent for ${esc(u.merchant)}.</p>
           <div class="prompt-box">
-            <textarea id="prompt" placeholder="e.g. ${esc(D.examplePrompts[0])}">${esc(state.draftPrompt || "")}</textarea>
+            <textarea id="prompt" data-i18n-value placeholder="e.g. ${esc(D.examplePrompts[0])}">${esc(state.draftPrompt || "")}</textarea>
             <div class="prompt-bar">
               <div class="seg" id="mode">
                 ${["auto", "voice", "chat", "flow"].map((m) => `<button data-m="${m}" class="${homeFilter.mode === m ? "on" : ""}">${m === "auto" ? "✨ Auto" : chIcon[m] + " " + chName[m]}</button>`).join("")}
@@ -566,13 +569,14 @@
     const prompt = $("#prompt");
     prompt.focus();
     $("#mode").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; homeFilter.mode = b.dataset.m; $$("#mode button").forEach((x) => x.classList.toggle("on", x === b)); };
-    $$(".chip").forEach((c) => (c.onclick = () => { prompt.value = c.dataset.p; prompt.focus(); }));
+    $$(".chip").forEach((c) => (c.onclick = () => { I18N.setValue(prompt, c.dataset.p); prompt.focus(); }));
     prompt.addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) $("#genBtn").click(); });
     $("#genBtn").onclick = () => {
       const p = prompt.value.trim();
       if (p.length < 8) { prompt.focus(); prompt.placeholder = "Tell us a bit more about the agent you want…"; return; }
       state.draftPrompt = p;
-      const { spec, reasons } = NEO.specFromPrompt(p, homeFilter.mode, u.industry);
+      const { spec, reasons } = NEO.specFromPrompt(I18N.source(p), homeFilter.mode, u.industry);
+      spec.purpose = p;
       spec.persona = "Joy";
       spec.csvFields = D.csvFieldsFor(spec);
       state.draft = { spec, reasons, fresh: true };
@@ -712,17 +716,17 @@
              <div class="page-head"><div><h1>Set up your ${chName[spec.channel].toLowerCase()} ${spec.channel === "flow" ? "" : "agent"}</h1><div style="margin-top:8px">${channelBadges(spec)}</div></div></div>`}
         <div class="grid-2">
           <div class="card card-pad" id="form">
-            <div class="section-title">Basics</div>
-            <label class="field"><span>Service name</span><input class="input" data-f="name" value="${esc(spec.name)}"></label>
+            <div class="section-title agent-information">Agent Information</div>
+            <label class="field"><span>Service name</span><input class="input" data-i18n-value data-f="name" value="${esc(spec.name)}"></label>
             <div class="row-2">
               <label class="field"><span>Agent persona name</span><input class="input" data-f="persona" value="${esc(spec.persona)}"></label>
               <label class="field"><span>Language</span><select class="select" data-f="language">
                 ${Object.entries(NEO.LANGS).map(([k, l]) => `<option value="${k}" ${spec.language === k ? "selected" : ""}>${l.label}</option>`).join("")}
               </select></label>
             </div>
-            <label class="field"><span>Goal / instructions</span><textarea class="textarea" data-f="purpose">${esc(spec.purpose)}</textarea></label>
-            <label class="field"><span>${spec.channel === "voice" ? "Opening line" : "Welcome message"}</span><textarea class="textarea" data-f="greeting" style="min-height:64px">${esc(spec.greeting)}</textarea>
-              <div class="hint">Use {persona} and {merchant} as placeholders.</div></label>
+            <label class="field"><span>Goal / instructions</span><textarea class="textarea" data-i18n-value data-f="purpose">${esc(spec.purpose)}</textarea></label>
+            <label class="field"><span>${spec.channel === "voice" ? "Opening line" : "Welcome message"}</span><textarea class="textarea" data-i18n-value data-f="greeting" style="min-height:64px">${esc(spec.greeting)}</textarea>
+              <div class="hint">Use {persona} and {enterprise} as placeholders.</div></label>
 
             <div class="section-title">Conversation steps</div>
             <div class="stage-list" id="stages"></div>
@@ -770,7 +774,7 @@
 
     let tab = "preview";
     const renderStages = () => {
-      $("#stages").innerHTML = spec.stages.map((s, i) => `<div class="stage"><span class="num">${i + 1}</span><input class="input" data-si="${i}" value="${esc(s)}"><button class="icon-btn" data-del="${i}" title="Remove step">✕</button></div>`).join("");
+      $("#stages").innerHTML = spec.stages.map((s, i) => `<div class="stage"><span class="num">${i + 1}</span><input class="input" data-i18n-value data-si="${i}" value="${esc(s)}"><button class="icon-btn" data-del="${i}" title="Remove step">✕</button></div>`).join("");
     };
     const renderPane = () => {
       if (tab === "preview") {
@@ -784,7 +788,7 @@
     };
     const renderVars = () => {
       const locked = (v) => spec.channel === "voice" && v === "customer_phone";
-      $("#vars").innerHTML = spec.csvFields.map((v, i) => `<span class="var-chip">${esc(v)}${locked(v) ? `<span class="lock" title="NEO dials this number, so it can't be removed">🔒</span>` : `<button type="button" data-vdel="${i}" title="Remove">✕</button>`}</span>`).join("");
+      $("#vars").innerHTML = spec.csvFields.map((v, i) => `<span class="var-chip"><code>${esc(v)}</code>${locked(v) ? `<span class="lock" title="NEO dials this number, so it can't be removed">🔒</span>` : `<button type="button" data-vdel="${i}" title="Remove">✕</button>`}</span>`).join("");
       if (origVars !== null) $("#varWarn").classList.toggle("hidden", JSON.stringify(spec.csvFields) === origVars);
     };
     renderStages();
@@ -899,7 +903,7 @@
       </div>`;
     $$("[data-restore]").forEach((b) => (b.onclick = () => {
       const v = +b.dataset.restore, x = a.versions.find((y) => y.v === v);
-      if (confirm(`Restore v${v}? It will be published as v${Math.max(...a.versions.map((y) => y.v)) + 1}.`)) republish(a, x.spec, `Restored v${v}`);
+      if (confirm(I18N.t(`Restore v${v}? It will be published as v${Math.max(...a.versions.map((y) => y.v)) + 1}.`))) republish(a, x.spec, `Restored v${v}`);
     }));
   }
 
@@ -916,10 +920,10 @@
     return t;
   }
 
-  function msgHtml(who, text, spec) {
+  function msgHtml(who, text, spec, verbatim) {
     if (who === "tool") return `<div class="msg tool">🔧 ${esc(text)}</div>`;
     const name = who === "agent" ? `${esc(spec.persona)} · AI` : "Customer";
-    return `<div class="msg ${who}"><span class="who">${name}</span>${esc(text)}</div>`;
+    return `<div class="msg ${who}"><span class="who">${name}</span>${verbatim ? `<span data-no-translate>${esc(text)}</span>` : esc(text)}</div>`;
   }
 
   // ---------- deploy ----------
@@ -938,10 +942,10 @@
     };
   }
 
-  // Each merchant only sees its own agents.
+  // Each enterprise only sees its own agents.
   const myAgents = () => state.agents.filter((a) => !a.owner || (state.user && a.owner === state.user.domain));
 
-  // Demo merchants start with three live agents from their industry:
+  // Demo enterprises start with three live agents from their industry:
   // two outbound voice agents and one chat agent.
   function seedAgents() {
     if (!state.user || !state.user.industry) return;
@@ -1038,7 +1042,7 @@
       <div class="success">
         <div class="big">✓</div>
         <h2 style="font-size:24px">${agent.lastAction === "update" ? `“${esc(s.name)}” is updated to v${agent.version}` : `“${esc(s.name)}” is live`}</h2>
-        ${agent.lastAction === "update" ? `<p class="muted" style="margin:6px 0 0">${esc(agent.updateNote || "")}.${agent.status === "paused" ? " The agent is still paused." : ""}</p>` : ""}
+        ${agent.lastAction === "update" ? `<p class="muted" style="margin:6px 0 0">${esc(agent.updateNote || "")}.${agent.status === "paused" ? "<span> The agent is still paused.</span>" : ""}</p>` : ""}
         <p class="muted" style="margin:6px 0 0">${s.channel === "voice" ? (s.direction === "inbound" ? "Customers can now call your AI hotline:" : "Your agent is ready to call customers from:") : s.channel === "chat" ? "Your chat widget is published and ready to embed." : "Your agentic flow is running in NEO."}</p>
         ${agent.phone ? `<div class="live-number">${agent.phone}</div><div class="small muted">Demo number, not a real line</div>` : ""}
         <div class="actions" style="justify-content:center;margin-top:24px">
@@ -1227,7 +1231,7 @@
     function previewTable() {
       const cols = t.file.headers;
       return `<div class="preview"><div class="small muted" style="margin-bottom:6px">Preview (first 3 of ${t.file.rows.length.toLocaleString()})</div>
-        <div style="overflow:auto"><table class="svc-table mini"><thead><tr>${cols.map((c) => `<th>${esc(c)}</th>`).join("")}</tr></thead>
+        <div style="overflow:auto"><table class="svc-table mini" data-no-translate><thead><tr>${cols.map((c) => `<th>${esc(c)}</th>`).join("")}</tr></thead>
         <tbody>${t.file.rows.slice(0, 3).map((r) => `<tr>${cols.map((_, i) => `<td>${esc(r[i] || "")}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
     }
 
@@ -1477,7 +1481,7 @@
         const v = $("#chatIn").value.trim(); if (!v) return;
         $("#chatIn").value = "";
         const tr = $("#tr");
-        tr.insertAdjacentHTML("beforeend", msgHtml("customer", v, s));
+        tr.insertAdjacentHTML("beforeend", msgHtml("customer", v, s, true));
         tr.insertAdjacentHTML("beforeend", `<div class="typing" id="typing"><i></i><i></i><i></i></div>`);
         tr.scrollTop = tr.scrollHeight;
         later(() => {

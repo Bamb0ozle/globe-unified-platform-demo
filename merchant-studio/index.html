@@ -8,11 +8,27 @@
   <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-  <div id="app"></div>
-  <noscript>This mockup needs JavaScript enabled.</noscript>
-  <!-- Plain scripts (no modules) so the page also works when opened straight from disk. -->
-  <script src="assets/data.js"></script>
-  <script src="assets/neo-export.js"></script>
-  <script src="assets/app.js"></script>
+  <div id="app">
+    <main class="entry-gate" aria-labelledby="entry-title">
+      <section class="card entry-card">
+        <div class="entry-language" data-language-switch></div>
+        <div class="logo"><img class="logo-img" src="assets/globe-logo-blue.png" alt="Globe"><div class="logo-text">AI Studio<small>for Business</small></div></div>
+        <h1 id="entry-title">Enter the password</h1>
+        <p class="muted">Use the access password to open Globe AI Studio.</p>
+        <form id="entry-form" novalidate>
+          <label class="field" for="entry-password"><span>Password</span>
+            <input class="input" id="entry-password" type="password" autocomplete="current-password" autocapitalize="off" spellcheck="false" aria-describedby="entry-error" required>
+          </label>
+          <p class="error entry-error" id="entry-error" role="alert"></p>
+          <button class="btn btn-primary btn-lg" id="entry-submit" type="submit" disabled>Open application</button>
+        </form>
+      </section>
+    </main>
+  </div>
+  <noscript>JavaScript is required to verify the password and open this application.</noscript>
+  <!-- The gate loads the plain app scripts only after password verification. -->
+  <script src="assets/i18n-tl.js"></script>
+  <script src="assets/i18n.js"></script>
+  <script src="assets/entry-gate.js"></script>
 </body>
 </html>

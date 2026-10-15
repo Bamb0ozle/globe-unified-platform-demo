@@ -27,7 +27,8 @@ window.GMS_NEO = (function () {
   }
   const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   const pretty = (o) => JSON.stringify(o, null, 4);
-  const fill = (s, ctx) => String(s || "").replace(/\{merchant\}/g, ctx.merchant).replace(/\{persona\}/g, ctx.persona);
+  // Keep the legacy placeholder working for saved agents.
+  const fill = (s, ctx) => String(s || "").replace(/\{(?:enterprise|merchant)\}/g, ctx.merchant).replace(/\{persona\}/g, ctx.persona);
 
   const LANGS = {
     en: { label: "English", code: "en-US", candidates: ["en-US", "fil-PH"] },
@@ -404,9 +405,9 @@ window.GMS_NEO = (function () {
     if (tools) reasons.push(["Tools", tools.join(", ")]);
 
     const greeting = useMatch ? match.greeting
-      : channel === "voice" && direction === "outbound" ? "Hi, this is {persona} from {merchant}. Do you have a quick minute?"
-      : channel === "voice" ? "Thank you for calling {merchant}! This is {persona}. How can I help you today?"
-      : "Hi! I'm {persona}, {merchant}'s assistant. How can I help?";
+      : channel === "voice" && direction === "outbound" ? "Hi, this is {persona} from {enterprise}. Do you have a quick minute?"
+      : channel === "voice" ? "Thank you for calling {enterprise}! This is {persona}. How can I help you today?"
+      : "Hi! I'm {persona}, {enterprise}'s assistant. How can I help?";
 
     return {
       spec: {

@@ -79,6 +79,16 @@ h1, h2, h3, h4 { margin: 0; line-height: 1.2; color: var(--globe-navy); font-wei
 .btn-sm { padding: 6px 14px; font-size: 13px; border-radius: var(--pill); border-width: 1px; }
 .btn-lg { padding: 15px 28px; font-size: 15.5px; }
 
+/* ---------- interface language ---------- */
+.language-switch { display: inline-flex; align-items: center; gap: 2px; padding: 3px; border: 1px solid var(--line-strong); border-radius: var(--pill); background: #fff; white-space: nowrap; }
+.language-switch button { padding: 6px 9px; border: 0; border-radius: var(--pill); background: transparent; color: var(--globe-navy); font-size: 12px; font-weight: 700; }
+.language-switch button[aria-pressed="true"] { color: #fff; background: var(--action); }
+.language-switch button:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
+.entry-language { display: flex; justify-content: flex-end; margin-bottom: 24px; }
+.auth-form { position: relative; }
+.auth-language { position: absolute; top: 24px; right: 24px; }
+.section-title.agent-information { text-transform: none; letter-spacing: normal; }
+
 /* ---------- top bar ---------- */
 .topbar { position: sticky; top: 0; z-index: 20; background: #fff; box-shadow: 0 1px 0 var(--line); }
 .topbar-inner { max-width: 1240px; margin: 0 auto; padding: 0 24px; height: 72px; display: flex; align-items: center; gap: 32px; }
@@ -138,6 +148,16 @@ h1, h2, h3, h4 { margin: 0; line-height: 1.2; color: var(--globe-navy); font-wei
 .shape.circle-m { background: var(--k-magenta); border-radius: 50%; }
 .shape.ring { border: 1.5px solid rgba(255, 255, 255, 0.5); border-radius: var(--pill) var(--pill) 0 0; border-bottom: 0; }
 .shape.circle-a { background: var(--k-azure); border-radius: 50%; }
+
+/* ---------- entry gate ---------- */
+.entry-gate { display: grid; place-items: center; padding: 32px 20px; background: var(--navy-deep); background-image: radial-gradient(ellipse at top right, var(--globe-navy), transparent 65%); }
+.entry-card { width: 100%; max-width: 440px; padding: clamp(24px, 6vw, 40px); box-shadow: var(--shadow-lg); }
+.entry-card .logo { margin-bottom: 32px; }
+.entry-card h1 { font-size: 26px; }
+.entry-card > p { margin: 10px 0 24px; }
+.entry-card .field { margin-bottom: 0; }
+.entry-error { min-height: 20px; margin: 8px 0 16px; }
+.entry-card .btn { width: 100%; }
 
 /* ---------- auth ---------- */
 .auth { min-height: 100vh; display: grid; grid-template-columns: 1.05fr 1fr; }
@@ -555,6 +575,7 @@ label.field.has-error > span { color: var(--danger); }
 /* ---------- editable agents ---------- */
 .var-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .var-chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 12.5px; font-weight: 600; padding: 4px 6px 4px 10px; border-radius: 6px; background: var(--sky-50); color: var(--globe-navy); }
+.var-chip code { font: inherit; }
 .var-chip button { border: 0; background: transparent; color: var(--muted); padding: 0 4px; font-size: 12px; line-height: 1; border-radius: 4px; }
 .var-chip button:hover { color: var(--danger); background: var(--danger-50); }
 .var-chip .lock { font-size: 11px; padding-right: 4px; cursor: help; }
@@ -580,3 +601,17 @@ details.subtle { margin-top: 18px; border-top: 1px solid var(--line); padding-to
 details.subtle summary { cursor: pointer; font-size: 12.5px; color: var(--muted); list-style: none; width: fit-content; }
 details.subtle summary::-webkit-details-marker { display: none; }
 details.subtle summary:hover { color: var(--action); text-decoration: underline; }
+
+@media (max-width: 960px) {
+  .topbar .language-switch span { display: none; }
+  .topbar-inner { flex-wrap: wrap; height: auto; min-height: 64px; padding: 12px 16px; }
+  .topbar-right { gap: 10px; }
+  .auth-form { padding-top: 88px; }
+}
+
+@media (max-width: 600px) {
+  .topbar-inner { flex-wrap: wrap; height: auto; min-height: 72px; padding-top: 10px; padding-bottom: 10px; }
+  .topbar-right { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+  .merchant-chip { max-width: calc(100% - 84px); }
+  .merchant-chip .who { min-width: 0; overflow-wrap: anywhere; }
+}

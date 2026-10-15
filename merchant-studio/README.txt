@@ -1,7 +1,7 @@
 GLOBE AI STUDIO - CLICKABLE MOCKUP
 ==================================
 
-A concept mockup of a merchant self-service platform: Globe merchants sign in
+A concept mockup of a enterprise self-service platform: Globe enterprises sign in
 and build AI voice / chat / flow agents, powered by NEO in the background.
 
 Everything is simulated in your browser. No real email, NEO, or telephony
@@ -20,18 +20,30 @@ Option B (runs on http://localhost:4173):
 
 DEMO SCRIPT (about 5 minutes)
 -----------------------------
-1. Start screen: choose "Existing Merchant" or "Register Now".
-   - Existing Merchant: sign in with  ops@neofoodresto.com.ph  (pre-registered
+Enter the access password supplied by the demo owner before opening the app.
+The password is required again after a reload, including saved enterprise sessions.
+This browser-only gate does not protect source files on static hosting.
+Use server-side authentication when enforced access protection is needed.
+
+Use EN (English) or tl (Tagalog) to change the interface language.
+The switch is on the entry gate, sign-in screens, and app header.
+The language choice is saved for the next visit. Switching preserves form entries.
+All 40 templates, default form content, and sample conversations have Tagalog copy.
+CSV headers, user content, and NEO JSON keep their original values.
+The agent setup section is named "Agent Information".
+
+1. Start screen: choose "Existing Enterprise" or "Register Now".
+   - Existing Enterprise: sign in with  ops@neofoodresto.com.ph  (pre-registered
      demo account). The one-time code appears in the "Demo inbox" pop-up;
      click "Use this code".
    - Register Now: search for the business (e.g. "Jollibee", "BDO",
-     "Mercury Drug"; 100 sample merchants, 25 per industry), enter a work
-     email on that merchant's domain (e.g. ops@jollibee.com.ph), click Verify,
+     "Mercury Drug"; 100 sample enterprises, 25 per industry), enter a work
+     email on that enterprise's domain (e.g. ops@jollibee.com.ph), click Verify,
      wait for the simulated check, then sign in with that email.
    - Unregistered emails are told to register first; personal domains are rejected.
-2. After sign-in you land straight on your industry's top 10 use cases (the
-   industry comes from the merchant directory). "See all templates" shows all
-   40 across industries. To change the industry, open Profile (merchant menu,
+2. After sign-in you land straight on your industry's top 10 Agents (the
+   industry comes from the enterprise directory). "See all templates" shows all
+   40 across industries. To change the industry, open Profile (enterprise menu,
    top right) > "Industry looks wrong?".
 3. Build page:
    a. Template path: click "Post-order feedback call", tweak it, look at the
@@ -39,7 +51,7 @@ DEMO SCRIPT (about 5 minutes)
    b. Prompt path: at the bottom, click "Want to build something else? Click here",
       describe the agent, "Generate agent", review the generated NEO JSON,
       then "Import into NEO".
-4. My Services: the merchant starts with three live agents. Select one, click
+4. My Services: the enterprise starts with three live agents. Select one, click
    "Trigger", upload a CSV (or use the sample list), then "Schedule" to fill in
    the NEO-style Schedule Details (name, days of week, period, Start Immediately).
    The required CSV headers are the agent's variables, as in NEO.
@@ -49,7 +61,7 @@ DEMO SCRIPT (about 5 minutes)
    variables. "Save & republish" publishes a new version; the Versions tab
    lists every version and can restore an older one. Schedules that already
    started keep the version they began with.
-5. Each merchant only sees its own agents. Use the merchant menu (top right) >
+5. Each enterprise only sees its own agents. Use the enterprise menu (top right) >
    "Reset demo data" to clear agents and registrations and start over.
 
 
@@ -63,9 +75,9 @@ Globe's typeface (FS Elliot Pro) is licensed and not included; the page uses it
 if installed, otherwise the system font.
 
 
-MERCHANT DIRECTORY
-------------------
-The 100 merchant names are real Philippine businesses, used for illustration
+ENTERPRISE DIRECTORY
+--------------------
+The 100 enterprise names are real Philippine businesses, used for illustration
 only (no affiliation implied). Their email domains are best guesses, and the
 domain "verification" is simulated.
 
