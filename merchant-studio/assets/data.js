@@ -472,7 +472,7 @@ window.GMS_DATA = (function () {
 
   // Demo account that is already registered (sign-in works without registering).
   const knownMerchants = {
-    "neofoodresto.com.ph": { name: "NeoFoodResto", industry: "food" },
+    "neofoodresto.com.ph": { name: "NeoFoodResto", industry: "food", logo: "assets/enterprise-logos/neofoodresto.svg" },
   };
 
   // Enterprise directory used by "Register Now": 25 Philippine businesses per industry.
@@ -524,7 +524,7 @@ window.GMS_DATA = (function () {
       ["Aventus Medical Care", "aventusmedical.com.ph"],
     ],
   };
-  const merchants = Object.entries(directory).flatMap(([industry, list]) => list.map(([name, domain]) => ({ name, domain, industry })));
+  const merchants = Object.entries(directory).flatMap(([industry, list]) => list.map(([name, domain]) => ({ name, domain, industry, logo: `assets/enterprise-logos/${domain}.png` })));
 
   function searchMerchants(q, limit) {
     const s = q.trim().toLowerCase();
@@ -552,7 +552,7 @@ window.GMS_DATA = (function () {
     const domain = (email.split("@")[1] || "").toLowerCase().trim();
     if (knownMerchants[domain]) return { domain, ...knownMerchants[domain], detected: true };
     const dm = merchantByDomain(domain);
-    if (dm) return { domain, name: dm.name, industry: dm.industry, detected: true };
+    if (dm) return { ...dm, detected: true };
     const base = domain.split(".")[0] || "enterprise";
     const name = base.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
     let industry = null;

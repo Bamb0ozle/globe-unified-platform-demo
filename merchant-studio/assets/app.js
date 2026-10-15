@@ -76,13 +76,30 @@
 
   // Official Globe logo (from globe.com.ph); white version for dark backgrounds.
   const logo = (dark) => `<div class="logo${dark ? " on-dark" : ""}"><img class="logo-img" src="assets/globe-logo-${dark ? "white" : "blue"}.png" alt="Globe"><div class="logo-text">AI Studio<small>for Business</small></div></div>`;
+  function enterpriseLogo(enterprise, size) {
+    const domain = String(enterprise.domain || "").toLowerCase();
+    const entry = D.merchantByDomain(domain) || D.knownMerchants[domain];
+    const name = enterprise.name || enterprise.merchant || "";
+    const initials = name.split(/\s+/).filter(Boolean).map((word) => word[0]).join("").slice(0, 2).toUpperCase();
+    return `<span class="enterprise-logo${size ? " enterprise-logo-" + size : ""}" aria-hidden="true" data-no-translate><span>${esc(initials)}</span>${entry && entry.logo ? `<img src="${esc(entry.logo)}" alt="" decoding="async">` : ""}</span>`;
+  }
+  function conversationHeader(spec, controls, title) {
+    return `<div class="json-head conversation-head"><div class="enterprise-identity">
+      ${enterpriseLogo(state.user)}
+      <div class="conversation-identity"><b data-no-translate>${esc(state.user.merchant)}</b><span class="small muted">${esc(title || (spec.channel === "flow" ? "Flow playground" : "Chat preview"))}</span></div>
+      </div>${controls || ""}</div>`;
+  }
+  // Keep the initials visible if a local image cannot load.
+  document.addEventListener("error", (event) => {
+    const image = event.target;
+    if (image.matches && image.matches(".enterprise-logo img")) image.classList.add("hidden");
+  }, true);
   const PHONE_ICON = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8z"/></svg>`;
   const waveBars = (n) => Array.from({ length: n }, (_, i) => `<i style="animation-delay:${(i * 0.09) % 1.2}s"></i>`).join("");
 
   // ---------- shell ----------
   function shell(active, body) {
     const u = state.user;
-    const initials = u.merchant.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
     return `
       <header class="topbar"><div class="topbar-inner">
         <a href="#/build">${logo()}</a>
@@ -93,7 +110,7 @@
         <div class="topbar-right">
           <div data-language-switch></div>
           <div class="merchant-chip" id="chip">
-            <div class="avatar">${esc(initials)}</div>
+            ${enterpriseLogo(u, "small")}
             <div class="who"><b>${esc(u.merchant)}</b><span class="muted">${esc(industry(u.industry).name)}</span></div>
             <div class="menu hidden" id="menu">
               <div class="small muted" style="padding:8px 12px">${esc(u.email)}</div>
@@ -233,7 +250,7 @@
           <label class="reg-label" for="mSearch">Enterprise Name <i>*</i></label>
           ${m ? `
             <div class="merchant-pick">
-              <span class="mp-ic">${industry(m.industry).icon}</span>
+              ${enterpriseLogo(m)}
               <span class="mp-txt"><b>${esc(m.name)}</b><span class="muted small">${esc(industry(m.industry).name)} · ${esc(m.domain)}</span></span>
               <button class="btn-link small" id="changeMerchant">Change</button>
             </div>` : `
@@ -281,7 +298,7 @@
         reg.active = 0;
         if (!input.value.trim()) { list.classList.add("hidden"); input.setAttribute("aria-expanded", "false"); return; }
         list.innerHTML = results.length
-          ? results.map((r, i) => `<button type="button" class="sg ${i === 0 ? "on" : ""}" role="option" data-i="${i}"><span class="sg-ic">${industry(r.industry).icon}</span><span class="sg-txt"><b>${hl(r.name, input.value)}</b><span>${esc(industry(r.industry).name)} · ${esc(r.domain)}</span></span></button>`).join("")
+          ? results.map((r, i) => `<button type="button" class="sg ${i === 0 ? "on" : ""}" role="option" data-i="${i}">${enterpriseLogo(r)}<span class="sg-txt"><b>${hl(r.name, input.value)}</b><span>${esc(industry(r.industry).name)} · ${esc(r.domain)}</span></span></button>`).join("")
           : `<div class="sg-empty">No enterprise matches “${esc(input.value.trim())}”. Try <b>Jollibee</b>, <b>BDO</b> or <b>Mercury Drug</b>.</div>`;
         list.classList.remove("hidden");
         input.setAttribute("aria-expanded", "true");
@@ -328,6 +345,7 @@
       ];
       box.innerHTML = `
         <div class="verifying">
+          <div class="enterprise-identity enterprise-identity-centered">${enterpriseLogo(m)}<b>${esc(m.name)}</b></div>
           <div class="spinner-lg" id="vSpin"></div>
           <h2 id="vTitle">Verifying now…</h2>
           <p class="sub">Checking that <b>${esc(email)}</b> belongs to <b>${esc(m.name)}</b>.</p>
@@ -366,6 +384,7 @@
   function renderVerify(err) {
     const box = $("#authbox");
     box.innerHTML = `
+      <div class="enterprise-identity">${enterpriseLogo(otp.merchant)}<b>${esc(otp.merchant.name)}</b></div>
       <h2>Check your email</h2>
       <p class="sub">We sent a 6-digit code to <b>${esc(otp.email)}</b>.</p>
       <form id="otpForm" novalidate>
@@ -446,8 +465,8 @@
     if (!showAll) {
       body = `
         <div class="page-head">
-          <div><h1>${mine.icon} Top Agents for ${esc(mine.name)}</h1>
-          <p class="muted" style="margin:6px 0 0">Ready-made agents for ${esc(u.merchant)}. Pick one, adjust it, and deploy to NEO.</p></div>
+          <div class="enterprise-page-heading">${enterpriseLogo(u, "large")}<div><h1>${mine.icon} Top Agents for ${esc(mine.name)}</h1>
+          <p class="muted" style="margin:6px 0 0">Ready-made agents for ${esc(u.merchant)}. Pick one, adjust it, and deploy to NEO.</p></div></div>
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${chSeg}<a class="btn btn-ghost btn-sm" href="#/build/all">See all templates →</a></div>
         </div>
         <div class="tpl-grid">${templateCards(u.industry)}</div>`;
@@ -457,7 +476,7 @@
       body = `
         <div class="crumbs"><a href="#/build">Top Agents for ${esc(mine.name)}</a> › All templates</div>
         <div class="page-head">
-          <div><h1>All templates</h1><p class="muted" style="margin:6px 0 0">${total} ready-made agents across every industry. Use any of them, whatever your industry.</p></div>
+          <div class="enterprise-page-heading">${enterpriseLogo(u, "large")}<div><h1>All templates</h1><p class="muted" style="margin:6px 0 0">${total} ready-made agents across every industry. Use any of them, whatever your industry.</p></div></div>
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${chSeg}</div>
         </div>
         <div class="ind-chips" id="indChips">
@@ -503,7 +522,7 @@
         <div class="card card-pad" style="margin-bottom:18px">
           <div class="section-title">Business</div>
           <dl class="kv">
-            <dt>Enterprise</dt><dd>${esc(u.merchant)}</dd>
+            <dt>Enterprise</dt><dd class="enterprise-identity">${enterpriseLogo(u, "large")}<b>${esc(u.merchant)}</b></dd>
             <dt>Industry</dt><dd>${industry(u.industry).icon} ${esc(industry(u.industry).name)}</dd>
             <dt>Agents</dt><dd>${myAgents().length}</dd>
           </dl>
@@ -711,10 +730,10 @@
       <div class="page">
         ${editing
           ? `<div class="crumbs"><a href="#/services">My Services</a> › <a href="#/agent/${editing.id}/overview">${esc(editing.spec.name)}</a> › Edit</div>
-             <div class="page-head"><div><h1>Edit agent</h1><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">${channelBadges(spec)} <span class="badge badge-gray">Live: v${editing.version || 1}</span> <span class="small muted">Saving publishes v${(editing.version || 1) + 1}. Earlier versions stay available to restore.</span></div></div></div>
+             <div class="page-head"><div><div class="enterprise-page-heading">${enterpriseLogo(state.user, "large")}<div><h1>Edit agent</h1></div></div><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">${channelBadges(spec)} <span class="badge badge-gray">Live: v${editing.version || 1}</span> <span class="small muted">Saving publishes v${(editing.version || 1) + 1}. Earlier versions stay available to restore.</span></div></div></div>
              ${activeRuns ? `<div class="notice">⏳ ${activeRuns} running schedule${activeRuns > 1 ? "s keep" : " keeps"} using v${editing.version || 1} until finished. New schedules use the version you save now.</div>` : ""}`
           : `<div class="crumbs"><a href="#/build">Build</a> › ${tplName ? "Template: " + esc(tplName) : "Customize generated agent"}</div>
-             <div class="page-head"><div><h1>Set up your ${chName[spec.channel].toLowerCase()} ${spec.channel === "flow" ? "" : "agent"}</h1><div style="margin-top:8px">${channelBadges(spec)}</div></div></div>`}
+             <div class="page-head"><div><div class="enterprise-page-heading">${enterpriseLogo(state.user, "large")}<div><h1>Set up your ${chName[spec.channel].toLowerCase()} ${spec.channel === "flow" ? "" : "agent"}</h1></div></div><div style="margin-top:8px">${channelBadges(spec)}</div></div></div>`}
         <div class="grid-2">
           <div class="card card-pad" id="form">
             <div class="section-title agent-information">Agent Information</div>
@@ -780,7 +799,7 @@
     const renderPane = () => {
       KYC.stop();
       if (tab === "preview") {
-        $("#pane").innerHTML = `${KYC.matches(spec) ? KYC.markup() : `<div class="transcript">${transcriptFor(spec).map(([who, text]) => msgHtml(who, fill(text, spec), spec)).join("")}</div>`}
+        $("#pane").innerHTML = `${spec.channel !== "voice" ? conversationHeader(spec) : ""}${KYC.matches(spec) ? KYC.markup() : `<div class="transcript">${transcriptFor(spec).map(([who, text]) => msgHtml(who, fill(text, spec), spec)).join("")}</div>`}
           <div class="summary-box small muted">Sample ${spec.channel === "voice" ? "call" : "conversation"}. Your agent will adapt to what the customer actually says.</div>`;
         if (KYC.matches(spec)) KYC.mount($("#pane"));
       } else {
@@ -1010,9 +1029,9 @@
       <div class="page"><div class="deploy">
         <div class="crumbs"><a href="#/services">My Services</a> › Deploy</div>
         <div class="card deploy-card" id="dcard">
-          <div style="display:flex;align-items:center;gap:12px">
-            <div class="tpl-ic ic-${s.channel}" style="margin:0">${chIcon[s.channel]}</div>
-            <div><h2 style="font-size:20px">${updating ? "Updating" : "Deploying"} “${esc(s.name)}”</h2><div class="small muted">${updating ? `Publishing version ${agent.version} to NEO` : `Importing <span class="mono">${esc(agent.export.filename)}</span> into NEO`}</div></div>
+          <div class="enterprise-page-heading">
+            ${enterpriseLogo(state.user, "large")}
+            <div><h2 style="font-size:20px">${updating ? "Updating" : "Deploying"} “${esc(s.name)}”</h2><div class="small muted" data-no-translate>${esc(state.user.merchant)}</div><div class="small muted">${updating ? `Publishing version ${agent.version} to NEO` : `Importing <span class="mono">${esc(agent.export.filename)}</span> into NEO`}</div></div>
           </div>
           <div class="progress"><i id="bar"></i></div>
           <div class="small muted" style="margin-bottom:10px">Simulated, no live systems are called.</div>
@@ -1044,7 +1063,10 @@
     $("#dcard").innerHTML = `
       <div class="success">
         <div class="big">✓</div>
-        <h2 style="font-size:24px">${agent.lastAction === "update" ? `“${esc(s.name)}” is updated to v${agent.version}` : `“${esc(s.name)}” is live`}</h2>
+        <div class="enterprise-page-heading enterprise-identity-centered">
+          ${enterpriseLogo(state.user, "large")}
+          <div><h2 style="font-size:24px">${agent.lastAction === "update" ? `“${esc(s.name)}” is updated to v${agent.version}` : `“${esc(s.name)}” is live`}</h2><div class="small muted" data-no-translate>${esc(state.user.merchant)}</div></div>
+        </div>
         ${agent.lastAction === "update" ? `<p class="muted" style="margin:6px 0 0">${esc(agent.updateNote || "")}.${agent.status === "paused" ? "<span> The agent is still paused.</span>" : ""}</p>` : ""}
         <p class="muted" style="margin:6px 0 0">${s.channel === "voice" ? (s.direction === "inbound" ? "Customers can now call your AI hotline:" : "Your agent is ready to call customers from:") : s.channel === "chat" ? "Your chat widget is published and ready to embed." : "Your agentic flow is running in NEO."}</p>
         ${agent.phone ? `<div class="live-number">${agent.phone}</div><div class="small muted">Demo number, not a real line</div>` : ""}
@@ -1091,7 +1113,7 @@
     app.innerHTML = shell("services", `
       <div class="page">
         <div class="page-head">
-          <div><h1>My Services</h1><p class="muted" style="margin:4px 0 0">Agents running for ${esc(state.user.merchant)}.</p></div>
+          <div class="enterprise-page-heading">${enterpriseLogo(state.user, "large")}<div><h1>My Services</h1><p class="muted" style="margin:4px 0 0">Agents running for ${esc(state.user.merchant)}.</p></div></div>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
             <a class="btn btn-ghost" href="#/build">+ Build new</a>
             <button class="btn btn-primary" id="triggerBtn" disabled>⚡ Trigger</button>
@@ -1384,7 +1406,7 @@
         <div class="crumbs"><a href="#/services">My Services</a> › ${esc(s.name)}</div>
         <div class="page-head">
           <div class="agent-head">
-            <div class="tpl-ic ic-${s.channel}">${chIcon[s.channel]}</div>
+            ${enterpriseLogo(state.user, "large")}
             <div><h1>${esc(s.name)}</h1><div style="margin-top:6px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">${channelBadges(s)} ${a.phone ? `<span class="badge badge-gray mono">${a.phone}</span>` : ""} <span class="badge badge-gray">v${a.version || 1}</span> <span class="small muted">Persona: ${esc(s.persona)} · ${NEO.LANGS[s.language].label}</span></div></div>
           </div>
           <div style="display:flex;align-items:center;gap:16px">
@@ -1438,7 +1460,7 @@
         <div class="test-grid">
           <div class="phone"><div class="phone-screen">
             <div class="status" id="pStatus">${s.direction === "inbound" ? "Call your AI hotline" : "Have the agent call you"}</div>
-            <div class="avatar-lg"><img src="assets/globe-mark-64.png" alt=""></div>
+            <div class="avatar-lg">${enterpriseLogo(state.user, "call")}</div>
             <div class="caller">${esc(s.persona)} · ${esc(state.user.merchant)}</div>
             <div class="status mono">${a.phone}</div>
             <div class="wave" id="pWave">${waveBars(28)}</div>
@@ -1488,7 +1510,7 @@
     } else {
       $("#tabBody").innerHTML = `
         <div class="card" style="max-width:720px">
-          <div class="json-head"><b style="font-size:14px">${s.channel === "flow" ? "Flow playground" : "Chat preview"}</b><button class="btn btn-ghost btn-sm" id="replay">▶ Play sample conversation</button></div>
+          ${conversationHeader(s, `<button class="btn btn-ghost btn-sm" id="replay">▶ Play sample conversation</button>`)}
           <div class="transcript" id="tr" style="min-height:320px"></div>
           <form class="chat-input" id="chatForm"><input class="input" id="chatIn" placeholder="Type a message…"><button class="btn btn-primary">Send</button></form>
           <div class="summary-box hidden" id="sumBox"></div>
@@ -1566,7 +1588,7 @@
   function openTranscript(s) {
     const bg = document.createElement("div");
     bg.className = "modal-bg";
-    bg.innerHTML = `<div class="card modal"><div class="json-head"><b>Transcript</b><button class="btn btn-ghost btn-sm" id="closeM">Close</button></div>
+    bg.innerHTML = `<div class="card modal">${conversationHeader(s, `<button class="btn btn-ghost btn-sm" id="closeM">Close</button>`, "Transcript")}
       <div class="transcript">${transcriptFor(s).map(([w, t]) => msgHtml(w, fill(t, s), s)).join("")}</div><div class="summary-box" id="mSum"></div></div>`;
     document.body.appendChild(bg);
     showSummary(s, $("#mSum", bg));

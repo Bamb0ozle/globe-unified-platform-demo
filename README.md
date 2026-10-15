@@ -139,13 +139,18 @@ The recordings use Joy and a sample bank. Editing an agent does not regenerate t
 | `merchant-studio/assets/audio/` | English and Tagalog KYC MP3 recordings |
 | `merchant-studio/assets/neo-export.js` | Builds NEO voice / chat / flow import JSON |
 | `merchant-studio/assets/data.js` | Industries, templates, demo enterprise detection |
+| `merchant-studio/assets/enterprise-logos/` | Local enterprise logos, website icons, the demo mark, and image sources |
 | `merchant-studio/assets/styles.css` | Globe branding, form controls, layout, and responsive styles |
 | `merchant-studio/server.js` | Node.js static server with audio byte-range support |
 | `merchant-studio/tools/generate-kyc-audio.py` | Development tool that rebuilds KYC recordings and word timings |
-| `merchant-studio/tests/` | KYC content, playback, synchronization, and audio-server checks |
+| `merchant-studio/tests/` | KYC content, playback, synchronization, audio-server, and enterprise-logo checks |
 | `neo-export-samples/` | Redacted real NEO exports used as the reference for the JSON structure |
 
 The app includes local Globe blue/white logos, NEO branding, and OneByZero full and compact marks. The footer identifies the app as a discussion mockup and shows NEO and OneByZero credits.
+
+All 100 directory enterprises have bundled logos or website icons. They appear in enterprise search results, registration selection and verification, sign-in verification, the app header, Profile, and voice test calls. Logos also appear beside the Build and My Services headings. The shared agent heading uses the enterprise logo across Overview, Test, Logs, Versions, JSON, and Schedules. The configure screen shows the logo to the left of “Set up your…” and “Edit agent”. Chat and flow previews show the enterprise logo and name during setup and testing. Deployment progress and success show the logo beside the agent name. Transcript dialogs show the logo and enterprise name above the conversation. Images retain their aspect ratio and work offline. Saved sessions resolve the logo by enterprise domain. Initials appear for unknown enterprises or if an image cannot load.
+
+`merchant-studio/assets/enterprise-logos/sources.json` records each image source. Robinsons Bank uses its archived mark from JG Summit. QualiMed uses its Healthway Medical Network brand. NeoFoodResto has a custom demo mark. The demo directory domains remain unchanged.
 
 ## Development checks and audio generation
 
@@ -155,13 +160,13 @@ For KYC content, translation alignment, playback controls, and transcript synchr
 node --test merchant-studio/tests/kyc.test.cjs
 ```
 
-To also check Node.js audio delivery, including byte ranges and seeking responses:
+To also check Node.js audio delivery, byte ranges, and local enterprise logo coverage:
 
 ```sh
-node --test merchant-studio/tests/kyc.test.cjs merchant-studio/tests/audio-server.test.cjs
+node --test merchant-studio/tests/kyc.test.cjs merchant-studio/tests/audio-server.test.cjs merchant-studio/tests/enterprise-logos.test.cjs
 ```
 
-The complete suite has 16 checks and requires only Node.js. The app has no build step or runtime package dependencies. Native Safari playback and visual rendering still require a browser check.
+The complete suite has 17 checks and requires only Node.js. The app has no build step or runtime package dependencies. Native Safari playback and visual rendering still require a browser check.
 
 The bundled recordings were generated with [edge-tts](https://github.com/rany2/edge-tts) and ffmpeg. They use the [Microsoft voices](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support) below:
 
@@ -217,5 +222,6 @@ Kinetic accents include teal `#10C499`, purple `#7E12E3`, magenta `#EA2283`, yel
 - Preserve `customer_phone` exactly in voice stage variables and CSV headers.
 - Preserve existing agent versions, schedules, user input, CSV keys, and machine-readable NEO JSON when changing interface copy.
 - Rebuild the recording and its word timestamps together when changing the recorded KYC script.
+- Bundle a matching local logo and update `merchant-studio/assets/enterprise-logos/sources.json` when adding an enterprise to the directory.
 
 The previous handoff recorded the original Windows working folder as `C:\Users\SeanEscalante\Documents\globe-unified-merchants-platform\`. This historical path is not required to run the project.
