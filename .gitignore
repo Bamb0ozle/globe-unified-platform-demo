@@ -1,7 +1,7 @@
 # Raw NEO exports contain live credentials. Only the redacted copies in neo-export-samples/ are committed.
 /*.json
 
-# Build output (regenerate with package.ps1)
+# Local build output
 dist/
 
 # Local tooling / scratch

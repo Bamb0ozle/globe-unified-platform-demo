@@ -39,8 +39,12 @@
     const buttons = Array.from(root.querySelectorAll("[data-kyc-language]"));
     let recording;
     let messages = [];
+    let textNodes = [];
+    let prompt;
     let highlighted = -1;
     let destroyed = false;
+    let started = false;
+    let frame = null;
     let request = 0;
 
     function state(value) {
@@ -48,24 +52,57 @@
     }
 
     function sync() {
+      if (destroyed || !recording) return;
       const time = audio.currentTime || 0;
-      const index = recording.turns.findIndex((turn) => time >= turn.start && time < turn.end);
+      const visibleTime = started || time > 0 ? time : -1;
+      let index = -1;
+      let revealed = false;
+      let changed = false;
+      recording.turns.forEach((turn, i) => {
+        let endOffset = 0;
+        for (const word of turn.words) {
+          if (word.start > visibleTime) break;
+          endOffset = word.endOffset;
+        }
+        const text = turn.text.slice(0, endOffset);
+        if (textNodes[i].textContent !== text) {
+          textNodes[i].textContent = text;
+          changed = true;
+        }
+        messages[i].classList.toggle("hidden", endOffset === 0);
+        revealed = revealed || endOffset > 0;
+        if (visibleTime >= turn.words[0].start && visibleTime < turn.words[turn.words.length - 1].end) index = i;
+      });
+      prompt.classList.toggle("hidden", revealed);
       if (index !== highlighted) {
         messages.forEach((message, i) => message.classList.toggle("speaking", i === index));
         highlighted = index;
-        if (index >= 0 && !audio.paused) {
-          const message = messages[index];
-          transcript.scrollTop = Math.max(0, message.offsetTop - transcript.offsetTop - 12);
-        }
       }
+      if (changed) transcript.scrollTop = transcript.scrollHeight;
       if (callbacks.onTime) callbacks.onTime(time);
       if (callbacks.onSpeaker) callbacks.onSpeaker(!audio.paused && index >= 0 ? recording.turns[index].who : null);
+    }
+
+    function cancelFrame() {
+      if (frame !== null) window.cancelAnimationFrame(frame);
+      frame = null;
+    }
+
+    function followAudio() {
+      if (frame !== null || destroyed || audio.paused || audio.ended) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = null;
+        sync();
+        followAudio();
+      });
     }
 
     function changeLanguage(language) {
       if (!recordings[language]) return;
       request++;
+      cancelFrame();
       audio.pause();
+      started = false;
       selected = language;
       recording = recordings[language];
       audio.src = recording.src;
@@ -74,8 +111,10 @@
       error.classList.add("hidden");
       buttons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.kycLanguage === language)));
       transcript.lang = recording.lang;
-      transcript.innerHTML = recording.turns.map((turn) => `<div class="msg ${turn.who}"><span class="who">${turn.who === "agent" ? escape(recording.persona) + " · AI" : "Customer"}</span><span data-no-translate>${escape(turn.text)}</span></div>`).join("");
+      transcript.innerHTML = '<p class="small muted" data-kyc-prompt>Play the recording to reveal the conversation.</p>' + recording.turns.map((turn) => `<div class="msg ${turn.who} hidden"><span class="who">${turn.who === "agent" ? escape(recording.persona) + " · AI" : "Customer"}</span><span data-kyc-text data-no-translate></span></div>`).join("");
       messages = Array.from(transcript.querySelectorAll(".msg"));
+      textNodes = Array.from(transcript.querySelectorAll("[data-kyc-text]"));
+      prompt = transcript.querySelector("[data-kyc-prompt]");
       highlighted = -1;
       transcript.scrollTop = 0;
       state("idle");
@@ -84,6 +123,7 @@
     }
 
     function failed() {
+      cancelFrame();
       error.classList.remove("hidden");
       state("error");
       if (callbacks.onSpeaker) callbacks.onSpeaker(null);
@@ -97,12 +137,13 @@
       catch (e) { if (!destroyed && token === request) failed(); }
     }
 
-    audio.onplay = () => { error.classList.add("hidden"); state("playing"); sync(); };
-    audio.onplaying = () => { state("playing"); sync(); };
-    audio.onpause = () => { state("paused"); sync(); };
-    audio.onended = () => { state("ended"); sync(); };
-    audio.onwaiting = () => { state("loading"); if (callbacks.onSpeaker) callbacks.onSpeaker(null); };
+    audio.onplay = () => { started = true; error.classList.add("hidden"); state("playing"); sync(); followAudio(); };
+    audio.onplaying = () => { state("playing"); sync(); followAudio(); };
+    audio.onpause = () => { cancelFrame(); state("paused"); sync(); };
+    audio.onended = () => { cancelFrame(); state("ended"); sync(); };
+    audio.onwaiting = () => { cancelFrame(); state("loading"); if (callbacks.onSpeaker) callbacks.onSpeaker(null); };
     audio.ontimeupdate = sync;
+    audio.onseeking = sync;
     audio.onseeked = sync;
     audio.onerror = failed;
     buttons.forEach((button) => { button.onclick = () => changeLanguage(button.dataset.kycLanguage); });
@@ -112,7 +153,9 @@
       get playing() { return !audio.paused && !audio.ended; },
       stop() {
         request++;
+        cancelFrame();
         audio.pause();
+        started = false;
         audio.currentTime = 0;
         state("stopped");
         sync();
@@ -120,7 +163,8 @@
       destroy() {
         destroyed = true;
         request++;
-        ["onplay", "onplaying", "onpause", "onended", "onwaiting", "ontimeupdate", "onseeked", "onerror"].forEach((name) => { audio[name] = null; });
+        cancelFrame();
+        ["onplay", "onplaying", "onpause", "onended", "onwaiting", "ontimeupdate", "onseeking", "onseeked", "onerror"].forEach((name) => { audio[name] = null; });
         buttons.forEach((button) => { button.onclick = null; });
         audio.pause();
         audio.removeAttribute("src");

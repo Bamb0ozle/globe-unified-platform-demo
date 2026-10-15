@@ -14,43 +14,367 @@ window.GMS_KYC_AUDIO = {
         "who": "agent",
         "text": "Hi, this is Joy from your bank.",
         "start": 0.0,
-        "end": 3.36
+        "end": 3.36,
+        "words": [
+          {
+            "start": 0.103,
+            "end": 0.432,
+            "endOffset": 3
+          },
+          {
+            "start": 0.866,
+            "end": 1.011,
+            "endOffset": 8
+          },
+          {
+            "start": 1.05,
+            "end": 1.155,
+            "endOffset": 11
+          },
+          {
+            "start": 1.261,
+            "end": 1.432,
+            "endOffset": 15
+          },
+          {
+            "start": 1.497,
+            "end": 1.695,
+            "endOffset": 20
+          },
+          {
+            "start": 1.734,
+            "end": 1.866,
+            "endOffset": 25
+          },
+          {
+            "start": 1.905,
+            "end": 2.313,
+            "endOffset": 31
+          }
+        ]
       },
       {
         "who": "customer",
         "text": "Yes, speaking.",
         "start": 3.71,
-        "end": 5.918
+        "end": 5.918,
+        "words": [
+          {
+            "start": 3.813,
+            "end": 4.168,
+            "endOffset": 4
+          },
+          {
+            "start": 4.523,
+            "end": 4.957,
+            "endOffset": 14
+          }
+        ]
       },
       {
         "who": "agent",
         "text": "Your valid ID on file expires next month. Do you have a current ID ready to upload?",
         "start": 6.268,
-        "end": 13.588
+        "end": 13.588,
+        "words": [
+          {
+            "start": 6.371,
+            "end": 6.568,
+            "endOffset": 4
+          },
+          {
+            "start": 6.607,
+            "end": 7.002,
+            "endOffset": 10
+          },
+          {
+            "start": 7.055,
+            "end": 7.41,
+            "endOffset": 13
+          },
+          {
+            "start": 7.476,
+            "end": 7.621,
+            "endOffset": 16
+          },
+          {
+            "start": 7.66,
+            "end": 7.963,
+            "endOffset": 21
+          },
+          {
+            "start": 8.015,
+            "end": 8.568,
+            "endOffset": 29
+          },
+          {
+            "start": 8.647,
+            "end": 8.884,
+            "endOffset": 34
+          },
+          {
+            "start": 8.936,
+            "end": 9.305,
+            "endOffset": 41
+          },
+          {
+            "start": 10.215,
+            "end": 10.308,
+            "endOffset": 44
+          },
+          {
+            "start": 10.334,
+            "end": 10.439,
+            "endOffset": 48
+          },
+          {
+            "start": 10.452,
+            "end": 10.715,
+            "endOffset": 53
+          },
+          {
+            "start": 10.715,
+            "end": 10.768,
+            "endOffset": 55
+          },
+          {
+            "start": 10.873,
+            "end": 11.202,
+            "endOffset": 63
+          },
+          {
+            "start": 11.255,
+            "end": 11.544,
+            "endOffset": 66
+          },
+          {
+            "start": 11.597,
+            "end": 11.847,
+            "endOffset": 72
+          },
+          {
+            "start": 11.926,
+            "end": 11.992,
+            "endOffset": 75
+          },
+          {
+            "start": 12.11,
+            "end": 12.61,
+            "endOffset": 83
+          }
+        ]
       },
       {
         "who": "customer",
         "text": "Yes, I have a current ID ready.",
         "start": 13.938,
-        "end": 17.274
+        "end": 17.274,
+        "words": [
+          {
+            "start": 14.041,
+            "end": 14.396,
+            "endOffset": 4
+          },
+          {
+            "start": 14.804,
+            "end": 14.909,
+            "endOffset": 6
+          },
+          {
+            "start": 14.909,
+            "end": 15.146,
+            "endOffset": 11
+          },
+          {
+            "start": 15.146,
+            "end": 15.199,
+            "endOffset": 13
+          },
+          {
+            "start": 15.291,
+            "end": 15.567,
+            "endOffset": 21
+          },
+          {
+            "start": 15.633,
+            "end": 15.896,
+            "endOffset": 24
+          },
+          {
+            "start": 15.949,
+            "end": 16.238,
+            "endOffset": 31
+          }
+        ]
       },
       {
         "who": "agent",
         "text": "Please sign in to the official banking app and follow its instructions to upload the updated ID.",
         "start": 17.624,
-        "end": 24.416
+        "end": 24.416,
+        "words": [
+          {
+            "start": 17.727,
+            "end": 17.977,
+            "endOffset": 6
+          },
+          {
+            "start": 17.977,
+            "end": 18.319,
+            "endOffset": 11
+          },
+          {
+            "start": 18.358,
+            "end": 18.463,
+            "endOffset": 14
+          },
+          {
+            "start": 18.556,
+            "end": 18.608,
+            "endOffset": 17
+          },
+          {
+            "start": 18.661,
+            "end": 18.753,
+            "endOffset": 21
+          },
+          {
+            "start": 18.806,
+            "end": 19.306,
+            "endOffset": 30
+          },
+          {
+            "start": 19.345,
+            "end": 19.766,
+            "endOffset": 38
+          },
+          {
+            "start": 19.845,
+            "end": 20.108,
+            "endOffset": 42
+          },
+          {
+            "start": 20.135,
+            "end": 20.253,
+            "endOffset": 46
+          },
+          {
+            "start": 20.279,
+            "end": 20.634,
+            "endOffset": 53
+          },
+          {
+            "start": 20.713,
+            "end": 20.911,
+            "endOffset": 57
+          },
+          {
+            "start": 20.963,
+            "end": 21.648,
+            "endOffset": 70
+          },
+          {
+            "start": 21.661,
+            "end": 21.753,
+            "endOffset": 73
+          },
+          {
+            "start": 21.845,
+            "end": 22.279,
+            "endOffset": 80
+          },
+          {
+            "start": 22.279,
+            "end": 22.332,
+            "endOffset": 84
+          },
+          {
+            "start": 22.424,
+            "end": 22.99,
+            "endOffset": 92
+          },
+          {
+            "start": 23.056,
+            "end": 23.385,
+            "endOffset": 96
+          }
+        ]
       },
       {
         "who": "customer",
         "text": "Okay, I'll do it tonight.",
         "start": 24.766,
-        "end": 27.406
+        "end": 27.406,
+        "words": [
+          {
+            "start": 24.869,
+            "end": 25.171,
+            "endOffset": 5
+          },
+          {
+            "start": 25.619,
+            "end": 25.75,
+            "endOffset": 10
+          },
+          {
+            "start": 25.803,
+            "end": 25.908,
+            "endOffset": 13
+          },
+          {
+            "start": 25.961,
+            "end": 26.053,
+            "endOffset": 16
+          },
+          {
+            "start": 26.105,
+            "end": 26.474,
+            "endOffset": 25
+          }
+        ]
       },
       {
         "who": "agent",
         "text": "Thank you! Have a great day. Goodbye!",
         "start": 27.756,
-        "end": 32.772
+        "end": 32.772,
+        "words": [
+          {
+            "start": 27.859,
+            "end": 28.188,
+            "endOffset": 5
+          },
+          {
+            "start": 28.227,
+            "end": 28.345,
+            "endOffset": 10
+          },
+          {
+            "start": 29.374,
+            "end": 29.611,
+            "endOffset": 15
+          },
+          {
+            "start": 29.611,
+            "end": 29.663,
+            "endOffset": 17
+          },
+          {
+            "start": 29.742,
+            "end": 29.992,
+            "endOffset": 23
+          },
+          {
+            "start": 30.071,
+            "end": 30.229,
+            "endOffset": 28
+          },
+          {
+            "start": 31.309,
+            "end": 31.743,
+            "endOffset": 37
+          }
+        ]
       }
     ]
   },
@@ -68,43 +392,387 @@ window.GMS_KYC_AUDIO = {
         "who": "agent",
         "text": "Kumusta, ako si Joy mula sa iyong bangko.",
         "start": 0.0,
-        "end": 3.624
+        "end": 3.624,
+        "words": [
+          {
+            "start": 0.208,
+            "end": 0.616,
+            "endOffset": 8
+          },
+          {
+            "start": 0.879,
+            "end": 1.103,
+            "endOffset": 12
+          },
+          {
+            "start": 1.116,
+            "end": 1.274,
+            "endOffset": 15
+          },
+          {
+            "start": 1.287,
+            "end": 1.537,
+            "endOffset": 19
+          },
+          {
+            "start": 1.576,
+            "end": 1.853,
+            "endOffset": 24
+          },
+          {
+            "start": 1.853,
+            "end": 2.024,
+            "endOffset": 27
+          },
+          {
+            "start": 2.037,
+            "end": 2.247,
+            "endOffset": 33
+          },
+          {
+            "start": 2.261,
+            "end": 2.682,
+            "endOffset": 41
+          }
+        ]
       },
       {
         "who": "customer",
         "text": "Oo, ako nga.",
         "start": 3.974,
-        "end": 5.846
+        "end": 5.846,
+        "words": [
+          {
+            "start": 4.116,
+            "end": 4.221,
+            "endOffset": 3
+          },
+          {
+            "start": 4.221,
+            "end": 4.432,
+            "endOffset": 7
+          },
+          {
+            "start": 4.432,
+            "end": 4.669,
+            "endOffset": 12
+          }
+        ]
       },
       {
         "who": "agent",
         "text": "Mag-e-expire sa susunod na buwan ang ID na nasa talaan. May bago ka bang wastong ID na handang i-upload?",
         "start": 6.196,
-        "end": 13.948
+        "end": 13.948,
+        "words": [
+          {
+            "start": 6.404,
+            "end": 6.943,
+            "endOffset": 12
+          },
+          {
+            "start": 7.035,
+            "end": 7.167,
+            "endOffset": 15
+          },
+          {
+            "start": 7.167,
+            "end": 7.641,
+            "endOffset": 23
+          },
+          {
+            "start": 7.654,
+            "end": 7.759,
+            "endOffset": 26
+          },
+          {
+            "start": 7.785,
+            "end": 8.049,
+            "endOffset": 32
+          },
+          {
+            "start": 8.062,
+            "end": 8.207,
+            "endOffset": 36
+          },
+          {
+            "start": 8.259,
+            "end": 8.391,
+            "endOffset": 39
+          },
+          {
+            "start": 8.614,
+            "end": 8.733,
+            "endOffset": 42
+          },
+          {
+            "start": 8.746,
+            "end": 9.049,
+            "endOffset": 47
+          },
+          {
+            "start": 9.075,
+            "end": 9.707,
+            "endOffset": 55
+          },
+          {
+            "start": 10.643,
+            "end": 10.696,
+            "endOffset": 59
+          },
+          {
+            "start": 10.696,
+            "end": 10.959,
+            "endOffset": 64
+          },
+          {
+            "start": 10.972,
+            "end": 11.091,
+            "endOffset": 67
+          },
+          {
+            "start": 11.104,
+            "end": 11.262,
+            "endOffset": 72
+          },
+          {
+            "start": 11.275,
+            "end": 11.604,
+            "endOffset": 80
+          },
+          {
+            "start": 11.643,
+            "end": 11.814,
+            "endOffset": 83
+          },
+          {
+            "start": 12.025,
+            "end": 12.117,
+            "endOffset": 86
+          },
+          {
+            "start": 12.117,
+            "end": 12.485,
+            "endOffset": 94
+          },
+          {
+            "start": 12.525,
+            "end": 13.038,
+            "endOffset": 104
+          }
+        ]
       },
       {
         "who": "customer",
         "text": "Oo, may bago akong wastong ID na handang i-upload.",
         "start": 14.298,
-        "end": 17.706
+        "end": 17.706,
+        "words": [
+          {
+            "start": 14.427,
+            "end": 14.493,
+            "endOffset": 3
+          },
+          {
+            "start": 14.493,
+            "end": 14.664,
+            "endOffset": 7
+          },
+          {
+            "start": 14.677,
+            "end": 14.953,
+            "endOffset": 12
+          },
+          {
+            "start": 14.98,
+            "end": 15.164,
+            "endOffset": 18
+          },
+          {
+            "start": 15.164,
+            "end": 15.559,
+            "endOffset": 26
+          },
+          {
+            "start": 15.559,
+            "end": 15.716,
+            "endOffset": 29
+          },
+          {
+            "start": 15.73,
+            "end": 15.835,
+            "endOffset": 32
+          },
+          {
+            "start": 15.835,
+            "end": 16.216,
+            "endOffset": 40
+          },
+          {
+            "start": 16.23,
+            "end": 16.769,
+            "endOffset": 50
+          }
+        ]
       },
       {
         "who": "agent",
         "text": "Mag-sign in sa opisyal na app ng bangko at sundin ang mga tagubilin upang i-upload ang bagong ID.",
         "start": 18.056,
-        "end": 25.184
+        "end": 25.184,
+        "words": [
+          {
+            "start": 18.264,
+            "end": 18.58,
+            "endOffset": 8
+          },
+          {
+            "start": 18.685,
+            "end": 18.79,
+            "endOffset": 11
+          },
+          {
+            "start": 18.79,
+            "end": 18.935,
+            "endOffset": 14
+          },
+          {
+            "start": 18.948,
+            "end": 19.356,
+            "endOffset": 22
+          },
+          {
+            "start": 19.422,
+            "end": 19.501,
+            "endOffset": 25
+          },
+          {
+            "start": 19.553,
+            "end": 19.751,
+            "endOffset": 29
+          },
+          {
+            "start": 19.922,
+            "end": 20.08,
+            "endOffset": 32
+          },
+          {
+            "start": 20.119,
+            "end": 20.474,
+            "endOffset": 39
+          },
+          {
+            "start": 20.724,
+            "end": 20.83,
+            "endOffset": 42
+          },
+          {
+            "start": 20.843,
+            "end": 21.277,
+            "endOffset": 49
+          },
+          {
+            "start": 21.317,
+            "end": 21.409,
+            "endOffset": 53
+          },
+          {
+            "start": 21.422,
+            "end": 21.632,
+            "endOffset": 57
+          },
+          {
+            "start": 21.685,
+            "end": 22.277,
+            "endOffset": 67
+          },
+          {
+            "start": 22.514,
+            "end": 22.817,
+            "endOffset": 73
+          },
+          {
+            "start": 22.856,
+            "end": 23.382,
+            "endOffset": 82
+          },
+          {
+            "start": 23.435,
+            "end": 23.593,
+            "endOffset": 86
+          },
+          {
+            "start": 23.606,
+            "end": 23.974,
+            "endOffset": 93
+          },
+          {
+            "start": 24.014,
+            "end": 24.132,
+            "endOffset": 97
+          }
+        ]
       },
       {
         "who": "customer",
         "text": "Sige, gagawin ko mamayang gabi.",
         "start": 25.534,
-        "end": 28.462
+        "end": 28.462,
+        "words": [
+          {
+            "start": 25.716,
+            "end": 25.992,
+            "endOffset": 5
+          },
+          {
+            "start": 26.163,
+            "end": 26.65,
+            "endOffset": 13
+          },
+          {
+            "start": 26.663,
+            "end": 26.768,
+            "endOffset": 16
+          },
+          {
+            "start": 26.768,
+            "end": 27.163,
+            "endOffset": 25
+          },
+          {
+            "start": 27.176,
+            "end": 27.439,
+            "endOffset": 31
+          }
+        ]
       },
       {
         "who": "agent",
         "text": "Salamat! Magandang araw. Paalam!",
         "start": 28.812,
-        "end": 33.924
+        "end": 33.924,
+        "words": [
+          {
+            "start": 28.994,
+            "end": 29.48,
+            "endOffset": 8
+          },
+          {
+            "start": 30.562,
+            "end": 30.865,
+            "endOffset": 18
+          },
+          {
+            "start": 30.983,
+            "end": 31.457,
+            "endOffset": 24
+          },
+          {
+            "start": 32.483,
+            "end": 32.97,
+            "endOffset": 32
+          }
+        ]
       }
     ]
   }

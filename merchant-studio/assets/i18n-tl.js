@@ -462,6 +462,7 @@ window.GMS_TL = {
     "Audio unavailable. Reload the page to try again.": "Hindi ma-play ang audio. I-reload ang pahina upang subukang muli.",
     "Loading audio…": "Inihahanda ang audio…",
     "Playback paused": "Nakahinto ang audio",
+    "Play the recording to reveal the conversation.": "I-play ang rekording upang makita ang pag-uusap habang binibigkas ito.",
     "Press the green button to start a test call.": "Pindutin ang berdeng button upang magsimula ng pansubok na tawag.",
     "Start call": "Simulan ang tawag",
     "End call": "Tapusin ang tawag",
